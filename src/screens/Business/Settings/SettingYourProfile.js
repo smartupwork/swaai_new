@@ -218,7 +218,7 @@ if (isLoading) {
     <View style={styles.container}>
       {/* Header */}
       <Text style={styles.header}>Settings</Text>
-      <Text style={styles.subHeader}>Your Profile</Text>
+      <Text style={[styles.subHeader, {fontFamily: 'Poppins-Bold',fontWeight:'700'}]}>Your Profile</Text>
 
       {/* Profile Image */}
       <View style={styles.profileContainer}>
@@ -248,29 +248,31 @@ if (isLoading) {
           onChangeText={text => setBusinessName(text)}
         />
         <TextInput
+        editable={false}
           style={styles.input}
           placeholder="gmail@example.com"
           placeholderTextColor={COLORS.black}
           value={email}
           onChangeText={text => setEmail(text)}
         />
-        <TextInput
+        {/* <TextInput
           style={styles.input}
           placeholder="************"
           placeholderTextColor={COLORS.black}
           secureTextEntry
           value={password}
           onChangeText={text => setPassword(text)}
-        />
+        /> */}
         <TextInput
           style={styles.input}
           placeholderTextColor={COLORS.black}
-          placeholder="Business address"
+          placeholder="User address"
           value={bussinessAddress}
           onChangeText={text => setbussinessAddress(text)}
         />
 
         {/* Payment Methods */}
+        
         <TouchableOpacity
           onPress={() => navigation.navigate('SavedPaymentMethod')}
           style={styles.paymentMethod}>
@@ -307,8 +309,8 @@ const styles = ScaledSheet.create({
   },
   header: {
     fontSize: '24@ms',
-    fontWeight: '600',
-    fontFamily: 'Poppins-SemiBold', // Use Poppins font
+    fontWeight: '800',
+    fontFamily: 'Poppins-Bold', // Use Poppins font
     color: '#000000',
     marginBottom: '1@ms',
   },

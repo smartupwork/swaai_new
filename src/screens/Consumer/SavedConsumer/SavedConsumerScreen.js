@@ -60,7 +60,8 @@ const SavedConsumerScreen = ({navigation}) => {
        const response = await dispatch(savedBusinesses(data)).unwrap();
   //setDoneModalVisible(true);
         Alert.alert('Success', response?.message);
-      
+        fetchData(); // Refresh saved list
+
      } catch (err) {
        //   setIsLoading(false);
        console.log('error', err);
@@ -108,9 +109,9 @@ const SavedConsumerScreen = ({navigation}) => {
     <ScrollView contentContainerStyle={styles.container}>
       {/* Header */}
       <HeaderComp
-        leftClick={() => alert('heelo')}
+        // leftClick={() => alert('heelo')}
         //rightClick={() => alert('heelo')}
-        rightClick={() => alert('heelo')}
+        // rightClick={() => alert('heelo')}
       />
 
       {/* Sort and Filter */}
@@ -170,7 +171,7 @@ const SavedConsumerScreen = ({navigation}) => {
               //   navigation.navigate('ConsumserBusinessProfile', {id: item.id})
               // }
               style={styles.visitButton}>
-              <Text style={styles.visitText}>Save</Text>
+              <Text style={styles.visitText}>Unsave</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() =>
@@ -192,7 +193,7 @@ const SavedConsumerScreen = ({navigation}) => {
           <View style={styles.modalContent}>
             {/* Header */}
             <View style={styles.header}>
-              <TouchableOpacity onPress={() => setModalVisible(!moderateScale)}>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <Text style={styles.cancelText}>Cancel</Text>
               </TouchableOpacity>
               <Text style={styles.headerTitle}>Filter</Text>

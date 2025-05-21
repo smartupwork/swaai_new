@@ -619,62 +619,130 @@ setofferLoading(false);
   //   setModalVisible(false);
 
   // };
+  // const handleSave = async () => {
+  //   alert("lshjf")
+  //   setIsLoading(true);
+  
+  //   try {
+  //     const user = await AsyncStorage.getItem('user');
+  //     if (!user) {
+  //       Alert.alert('Error', 'User data not found');
+  //       setIsLoading(false);
+  //       return;
+  //     }
+  
+  //     const parsedUser = JSON.parse(user);
+  //     const userId = parsedUser.id;
+  
+  //     let finalBase64 = imageBase64;
+  
+  //     if (!finalBase64 && item?.image) {
+  //       finalBase64 = await convertImageToBase64(item.image);
+  //       console.log('Converted Base64:', finalBase64);
+  //     }
+  
+  //     const data = {
+  //       user_id: userId,
+  //       media_id: mediaId || '',
+  //       image: finalBase64 ? `data:image/jpeg;base64,${finalBase64}` : '',
+  //       title,
+  //       description,
+  //       image_redirect_url: redirectUrl,
+  //     };
+  //     console.log('Data being sent:', data);
+  //     if (!data.image) {
+  //       Alert.alert('Error', 'Please select Image');
+  //       setIsLoading(false);
+  //       return;
+  //     }
+  //     if (!data.title) {
+  //       Alert.alert('Error', 'Please enter title');
+  //       setIsLoading(false);
+  //       return;
+  //     }
+  //     if (!data.description) {
+  //       Alert.alert('Error', 'Please enter description');
+  //       setIsLoading(false);
+  //       return;
+  //     }
+  
+  //     console.log('Data being sent:', data);
+  
+  //     const response = await dispatch(insertImage(data)).unwrap();
+  //     console.log('Response:', response);
+  
+  //     Alert.alert('Success', response?.message);
+  //     fetchUserDetail();
+  //     setModalVisible(false);
+  //   } catch (err) {
+  //     console.error('Error in save:', err);
+  //     Alert.alert('Error Save api', err?.message || 'An unknown error occurred.');
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+  const[saveloader,setSaveloader]=useState(false)
   const handleSave = async () => {
-    setIsLoading(true);
-
+  
+  
     try {
-      // Get user data from AsyncStorage
       const user = await AsyncStorage.getItem('user');
       if (!user) {
-        alert('User data not found');
-        setIsLoading(false);
+        Alert.alert('Error', 'User data not found');
+        setSaveloader(false);
         return;
       }
-
+  
       const parsedUser = JSON.parse(user);
       const userId = parsedUser.id;
-
+  
       let finalBase64 = imageBase64;
-
-      // Convert image to Base64 if not already set
-      if (!imageBase64) {
-        finalBase64 = await convertImageToBase64(item.image);
+  
+      if (!finalBase64 && selectedItem?.image_url) {
+        finalBase64 = await convertImageToBase64(selectedItem.image_url);
         console.log('Converted Base64:', finalBase64);
       }
-
-      // Prepare data for API request
+  
       const data = {
         user_id: userId,
         media_id: mediaId || '',
         image: finalBase64 ? `data:image/jpeg;base64,${finalBase64}` : '',
-        title: title,
-        description: description,
+        title,
+        description,
         image_redirect_url: redirectUrl,
       };
-
+      
       console.log('Data being sent:', data);
-
-      // Dispatch API call
+      
+      if (!data.image) {
+        Alert.alert('Error', 'Please select Image');
+        setSaveloader(false);
+        return;
+      }
+      if (!data.title) {
+        Alert.alert('Error', 'Please enter title');
+        setSaveloader(false);
+        return;
+      }
+      if (!data.description) {
+        Alert.alert('Error', 'Please enter description');
+        setSaveloader(false);
+        return;
+      }
+      setSaveloader(true);
       const response = await dispatch(insertImage(data)).unwrap();
       console.log('Response:', response);
-
+  
       Alert.alert('Success', response?.message);
-
-      // Refresh user data after saving
       fetchUserDetail();
+      setSaveloader(false)
       setModalVisible(false);
     } catch (err) {
-      console.error('Error:', err);
-
-      if (typeof err === 'string') {
-        alert(err);
-      } else if (err && err.message) {
-        alert(err.message);
-      } else {
-        alert('An unknown error occurred.');
-      }
+      setSaveloader(false)
+      console.error('Error in save:', err);
+      Alert.alert('Error Save api', err?.message || 'An unknown error occurred.');
     } finally {
-      setIsLoading(false); // Ensure loading state resets in all cases
+      setSaveloader(false);
     }
   };
 
@@ -1143,7 +1211,17 @@ setofferLoading(false);
                 // }
               />
               <View style={styles.editmodalButtons}>
-                <Button title="Save" onPress={handleSave} />
+                {/* <Button title="Save" onPress={handleSave} /> */}
+                <TouchableOpacity 
+  onPress={handleSave}
+  style={[styles.saveButtonContainer,{backgroundColor:saveloader?'#86b0e3':COLORS.blue}]}
+>
+  {
+    saveloader? <Text style={[styles.saveButtonText1]}>Saving</Text>
+  :
+  <Text style={styles.saveButtonText1}>Save</Text>
+}
+</TouchableOpacity>
                 <Button
                   title="Cancel"
                   onPress={() => setModalVisible(false)}
@@ -1253,7 +1331,7 @@ const styles = ScaledSheet.create({
     marginTop: '8@vs',
     position: 'absolute',
     bottom: 20,
-    color: 'white',
+    color: 'black',
     left: 20,
   },
   imageRow: {
@@ -1501,6 +1579,20 @@ const styles = ScaledSheet.create({
   editmodalButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  saveButtonContainer: {
+    backgroundColor: COLORS.blue, // Or any color you prefer
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 5,
+  },
+  saveButtonText1: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

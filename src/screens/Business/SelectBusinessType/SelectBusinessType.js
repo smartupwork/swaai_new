@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Modal, TextInput, Alert, ScrollView} from 'react-native';
-import {ScaledSheet, s, scale} from 'react-native-size-matters';
+import {View, Text, TouchableOpacity, StyleSheet, Modal, TextInput, Alert, ScrollView, KeyboardAvoidingView, Platform} from 'react-native';
+import {ScaledSheet, moderateScale, s, scale} from 'react-native-size-matters';
 import ButtonComp from '../../../components/ButtonComp';
 import COLORS from '../../../constants/color';
 import { useDispatch } from 'react-redux';
@@ -11,9 +11,9 @@ import { Dropdown } from 'react-native-element-dropdown';
 
 const businessTypes = [
   {label: 'Local (Geo-targeted)', color: '#71C54B'},
-  {label: 'Family', color: '#28C0B4'},
-  {label: 'Cultural & Diverse', color: '#237490'},
-  {label: 'Sustainable', color: '#13355C'},
+  {label: 'Family', color: '#CCCCCC'},
+  {label: 'Cultural & Diverse', color: '#1B4250'},
+  {label: 'Sustainable', color: '#1D135C'},
   {label: 'Nonprofit', color: '#027A48'},
   {label: 'Other', color: '#08A5F4'},
 ];
@@ -180,6 +180,11 @@ const SelectBusinessType = ({navigation}) => {
   }
 
   return (
+    <KeyboardAvoidingView
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    style={{ flex: 1 }}
+    keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0} // adjust if needed
+  >
     <View style={styles.container}>
       <Text style={styles.title}>Select business type</Text>
 
@@ -215,6 +220,11 @@ const SelectBusinessType = ({navigation}) => {
           //onPress={() => navigation.replace('SplashBusiness2')}
         />
       </View>
+      <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0} // adjust if needed
+    >
       <Modal
         animationType="slide"
         transparent={true}
@@ -480,7 +490,9 @@ const SelectBusinessType = ({navigation}) => {
           </View>
         </View>
       </Modal>
+      </KeyboardAvoidingView>
     </View>
+      </KeyboardAvoidingView>
   );
 };
 
@@ -497,12 +509,13 @@ const styles = ScaledSheet.create({
     backgroundColor: '#FFFFFF',
   },
   title: {
-    fontSize: '28@s',
-    fontFamily: 'Poppins-SemiBold',
+    fontSize: '26@s',
+    fontFamily: 'Poppins-Bold',
+    fontWeight:'600',
     // textAlign: 'center',
     marginBottom: '20@vs',
     marginTop: '30@vs',
-    paddingHorizontal: scale(18),
+    paddingHorizontal: scale(8),
   },
   option: {
     paddingVertical: '12@s',
@@ -557,6 +570,7 @@ const styles = ScaledSheet.create({
     alignSelf: 'center',
     height: '80%',
     paddingTop: scale(40),
+    paddingBottom:moderateScale(200)
   },
   input: {
     width: '90%',

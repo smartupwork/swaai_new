@@ -780,7 +780,7 @@ console.log("daaaaa",data);
       //setDoneModalVisible(true);
       console.log('response saveAnalytics', response);
       
-      Alert.alert('Success', response?.message);
+      // Alert.alert('Success', response?.message);
     } catch (err) {
       //   setIsLoading(false);
       console.log('error saveAnalytics', err);

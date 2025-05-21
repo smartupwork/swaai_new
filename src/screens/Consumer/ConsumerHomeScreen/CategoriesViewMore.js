@@ -62,12 +62,14 @@ const CategoriesViewMore = ({navigation}) => {
       setBusinesses(response);
       //  setModalVisible(false);
       //  setSelectedFilters({});
+      console.log(response);
+      
       setLoading(false);
-      Alert.alert('Success', response?.message);
+      // Alert.alert('Success', response?.message);
     } catch (err) {
       setLoading(false);
       console.error('Error:', err);
-      Alert.alert('Error', err.message || 'An unknown error occurred.');
+      // Alert.alert('Error', err.message || 'An unknown error occurred.');
       //setModalVisible(false);
       // setSelectedFilters({});
     }
@@ -153,7 +155,7 @@ const CategoriesViewMore = ({navigation}) => {
     try {
       const response = await dispatch(saveAnalytics(data)).unwrap();
       //setDoneModalVisible(true);
-      Alert.alert('Success', response?.message);
+      // Alert.alert('Success', response?.message);
     } catch (err) {
       //   setIsLoading(false);
       console.log('error', err);
@@ -161,14 +163,14 @@ const CategoriesViewMore = ({navigation}) => {
       if (typeof err === 'string') {
         // Handle string error
         console.error('Error:', err);
-        alert(err);
+        // alert(err);
       } else if (err && err.message) {
         // Handle object error with message property
         console.error('Error message:', err.message);
-        alert(err.message);
+        // alert(err.message);
       } else {
         console.error('Unhandled error:', err);
-        alert('An unknown error occurred.');
+        // alert('An unknown error occurred.');
       }
     }
   };
@@ -224,7 +226,7 @@ const CategoriesViewMore = ({navigation}) => {
                 openWebsite(item.website_url);
               }}
               style={styles.card}>
-              <Image source={images.ImageReplace} style={styles.cardImage} />
+              <Image source={{uri:item.media_image}} style={styles.cardImage} />
               <Text style={styles.cardText}>{item.name}</Text>
             </TouchableOpacity>
           ))}

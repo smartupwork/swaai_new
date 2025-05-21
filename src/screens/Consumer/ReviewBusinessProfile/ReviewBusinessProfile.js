@@ -89,6 +89,11 @@ useEffect(() => {
         renderItem={renderReviewItem}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.listContainer}
+        ListEmptyComponent={() => (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No reviews found.</Text>
+          </View>
+        )}
       />
     </View>
   );

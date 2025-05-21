@@ -182,15 +182,15 @@ useEffect(() => {
         await AsyncStorage.removeItem('user');
         await AsyncStorage.removeItem('token');
       };
-    
+    const c=["#6BC841","#CCCCCC","#1B4250","#1D135C","#027A48","#08A5F4","#6BC841","#CCCCCC","#1B4250","#1D135C","#027A48","#08A5F4"]
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
       <HeaderComp
-        leftClick={() => {
-          logout();
-          navigation.navigate('SignInConsumerScreen');
-        }}
+        // leftClick={() => {
+        //   logout();
+        //   navigation.navigate('SignInConsumerScreen');
+        // }}
         // leftClick={() => alert('heelo')}
         //rightClick={() => alert('heelo')}
         msgClick={() => navigation.navigate('ConsumerChatListingScreen')}
@@ -239,7 +239,7 @@ useEffect(() => {
             data={pieData}
             donut
             showGradient
-            sectionAutoFocus
+            // sectionAutoFocus
             radius={scale(65)}
             innerRadius={scale(36)}
             innerCircleColor="#F4F4F4"
@@ -314,7 +314,7 @@ useEffect(() => {
           <TouchableOpacity
             onPress={() => navigation.navigate('CategoriesViewMore')}
             key={index}
-            style={[styles.categoryButton, {backgroundColor: '#027A48'}]}>
+            style={[styles.categoryButton, {backgroundColor: c[index]}]}>
             <Text style={styles.categoryText}>{category.name}</Text>
             <Text style={styles.viewMore}>View more {'>'}</Text>
           </TouchableOpacity>

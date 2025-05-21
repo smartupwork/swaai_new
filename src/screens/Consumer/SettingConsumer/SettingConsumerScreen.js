@@ -58,7 +58,7 @@ const SettingConsumerScreen = ({navigation}) => {
       <View style={styles.section}>
         <Text
           onPress={() => navigation.navigate('ChatScreen')}
-          style={[styles.sectionTitle, {fontFamily: 'Poppins-SemiBold'}]}>
+          style={[styles.sectionTitle, {fontFamily: 'Poppins-Bold',fontWeight:'800'}]}>
           Personal
         </Text>
         <View style={{marginTop: scale(14)}}>
@@ -85,6 +85,7 @@ const SettingConsumerScreen = ({navigation}) => {
       <View style={styles.section}>
         <Text style={styles.darkText}>Payment</Text>
         <TouchableOpacity
+        disabled
           onPress={() => navigation.navigate('SavedPaymentMethod')}
           style={styles.row}>
           <Text style={styles.sectionTitle}>Payment methods</Text>
@@ -205,7 +206,8 @@ const styles = ScaledSheet.create({
   },
   header: {
     fontSize: '24@s',
-    fontFamily: 'Poppins-SemiBold',
+    fontWeight:'800',
+    fontFamily: 'Poppins-Bold',
     marginVertical: '16@vs',
   },
   section: {
@@ -215,6 +217,7 @@ const styles = ScaledSheet.create({
     fontSize: '16@s',
     fontFamily: 'Poppins-Medium',
     color: '#202020',
+    fontWeight:'600'
     //  marginBottom: '8@vs',
   },
   row: {
@@ -228,6 +231,7 @@ const styles = ScaledSheet.create({
     fontSize: '16@s',
     fontFamily: 'Poppins-Regular',
     color: '#000',
+    fontWeight:'600',
     flex: 1,
   },
   value: {

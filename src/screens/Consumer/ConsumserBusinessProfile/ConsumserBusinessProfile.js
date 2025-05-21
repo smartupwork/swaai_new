@@ -31,6 +31,7 @@ import {
   saveAnalytics,
   toggleCheckIn,
 } from '../../../redux/slices/apiSlice';
+import { ActivityIndicator } from 'react-native-paper';
 
 const ConsumerBusinessProfile = ({navigation, route}) => {
   // Refs
@@ -49,7 +50,7 @@ const ConsumerBusinessProfile = ({navigation, route}) => {
   const [availOfferData, setAvailOfferData] = useState(null);
   const [isDoneModalVisible, setDoneModalVisible] = useState(false);
   const [loading, setLoading] = useState(true);
-
+const[reviewLoader,setReviewLoader]=useState(false)
   const dispatch = useDispatch();
   const id = route.params?.id;
 
@@ -92,7 +93,7 @@ const ConsumerBusinessProfile = ({navigation, route}) => {
       Alert.alert('Error', 'Please enter your review');
       return;
     }
-
+setReviewLoader(true)
     try {
       const response = await dispatch(
         addReview({
@@ -101,11 +102,12 @@ const ConsumerBusinessProfile = ({navigation, route}) => {
           review_text: comment,
         }),
       ).unwrap();
-
+      setReviewLoader(false)
       setDoneModalVisible(true);
       setModalVisible(false);
-      Alert.alert('Success', response?.message || 'Review submitted');
+      // Alert.alert('Success', response?.message || 'Review submitted');
     } catch (error) {
+      setReviewLoader(false)
       console.error('Review error:', error);
       Alert.alert('Error', error?.message || 'Failed to submit review');
     }
@@ -226,7 +228,7 @@ const ConsumerBusinessProfile = ({navigation, route}) => {
     <View style={styles.container}>
       <HeaderComp
         leftClick={() => navigation.goBack()}
-        rightClick={() => Alert.alert('Menu')}
+        // rightClick={() => Alert.alert('Menu')}
       />
 
       <ScrollView ref={scrollViewRef}>
@@ -288,20 +290,31 @@ const ConsumerBusinessProfile = ({navigation, route}) => {
           </View>
         </View>
         <View style={{paddingHorizontal: scale(12)}}>
-          <Text
-            onPress={() => {
-              if (businessDetail?.business?.website_url) {
-                handleAnalytics('click');
-                Linking.openURL(businessDetail.business.website_url);
-              } else {
-                Alert.alert('Error', 'Website URL not available');
-              }
-            }}
-            style={styles.businessAddress}
-            accessible={true}
-            accessibilityRole="link">
-            Visit Business Website
-          </Text>
+        <TouchableOpacity
+  onPress={async () => {
+    const rawUrl = businessDetail?.business?.website_url;
+    if (rawUrl) {
+      const url = rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`;
+      try {
+        handleAnalytics('click');
+        await Linking.openURL(url);
+      } catch (error) {
+        console.error('Failed to open URL:', error);
+        Alert.alert('Error', 'Unable to open the website.');
+      }
+    } else {
+      Alert.alert('Error', 'Website URL not available');
+    }
+  }}
+>
+  <Text
+    style={styles.businessAddress}
+    accessible={true}
+    accessibilityRole="link"
+  >
+    Visit Business Website
+  </Text>
+</TouchableOpacity>
 
           <View style={styles.companySummary}>
             <Text style={styles.companySummaryTitle}>
@@ -430,11 +443,23 @@ const ConsumerBusinessProfile = ({navigation, route}) => {
               multiline
             />
             <View style={{width: '115%', alignSelf: 'center'}}>
+              {
+                reviewLoader?<View style={{ width: '90%',
+                  paddingVertical: scale(5),
+                  borderRadius: scale(8),
+                  alignItems: 'center',
+                  marginVertical: scale(8),
+                  alignSelf:'center',
+                  backgroundColor:COLORS.green}}>
+                  <ActivityIndicator size={20} color='white'/>
+                  </View>
+              :
               <ButtonComp
                 title="Say it!"
                 backgroundColor={COLORS.green}
                 onPress={handleReview}
               />
+}
             </View>
           </View>
         </View>

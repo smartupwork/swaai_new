@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import {ScaledSheet, moderateScale, scale} from 'react-native-size-matters';
 import COLORS from '../../../constants/color';
@@ -61,7 +63,12 @@ const PaymentMethodScreen = ({navigation, route}) => {
     }
   };
 
-  return (
+  return (    <KeyboardAvoidingView
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    style={{ flex: 1 }}
+    keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0} // adjust if needed
+  >
+
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.header}>Add a payment method</Text>
@@ -258,6 +265,7 @@ const PaymentMethodScreen = ({navigation, route}) => {
         />
       </ScrollView>
     </View>
+    </KeyboardAvoidingView>
   );
 };
 

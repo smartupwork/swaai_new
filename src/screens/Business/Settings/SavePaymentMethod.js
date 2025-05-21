@@ -293,8 +293,8 @@ const handleSubmit = () => {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.optionLabel}>Option 4</Text>
-      <View style={styles.cardContainer}>
+      {/* <Text style={styles.optionLabel}>Option 4</Text> */}
+      {/* <View style={styles.cardContainer}>
         <TouchableOpacity
           style={styles.radioContainer}
           onPress={handleApplePaySelect}>
@@ -305,7 +305,7 @@ const handleSubmit = () => {
           />
           <Text style={styles.radioText}>Apple Pay</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       {/* Save Changes Button */}
       <View

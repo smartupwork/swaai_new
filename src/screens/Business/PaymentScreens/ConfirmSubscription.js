@@ -172,7 +172,7 @@ console.log("tikm",token);
                     />
                     <View style={{marginLeft: scale(6)}}>
                       <Text style={styles.planTitle}>{item.product}</Text>
-                      <Text style={styles.discountText}>-30% discount</Text>
+                      <Text style={styles.discountText}>{item.product=="Monthly"?"":"-16% discount"}</Text>
                     </View>
                   </View>
                 </View>

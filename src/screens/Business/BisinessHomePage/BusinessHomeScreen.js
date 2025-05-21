@@ -319,10 +319,10 @@ await AsyncStorage.removeItem('token');
   return (
     <View style={styles.container}>
       <HeaderComp
-        leftClick={() => {
-          logout();
-          navigation.navigate('SignInScreen');
-        }}
+        // leftClick={() => {
+        //   logout();
+        //   navigation.navigate('SignInScreen');
+        // }}
         //rightClick={() => alert('heelo')}
         msgClick={() => navigation.navigate('BussinessChatListingScreen')}
         rightClick={() => navigation.navigate('EditBusiness')}

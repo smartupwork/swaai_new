@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
     width: '80%',
     textAlign: 'center',
     marginTop: scale(30),
+    fontWeight:'700'
   },
   bottomSec: {
     // position: 'absolute',

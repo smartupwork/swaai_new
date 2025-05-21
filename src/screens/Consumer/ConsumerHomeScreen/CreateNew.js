@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import {moderateScale} from 'react-native-size-matters';
 import COLORS from '../../../constants/color';
@@ -22,18 +23,23 @@ const CreateNew = () => {
   const[description, setDescription] = useState('');
    const [imageBase64, setimageBase64] = useState('');
     const [image, setImage] = useState('');
+    const[createloading,setCreateLoading]=useState(false)
       const handleSave = async () => {
+        setCreateLoading(true)
         const user = await AsyncStorage.getItem('user');
 
         const id = JSON.parse(user);
         console.log('id', id.id);
         if (!communityName) {
           Alert.alert('Error', 'Please enter community name');
+          setCreateLoading(false)
           return;
         }else if (!description) {
+          setCreateLoading(false)
           Alert.alert('Error', 'Please enter description');
           return;
         }else if (!image) {
+          setCreateLoading(false)
           Alert.alert('Error', 'Please upload image');
           return;
         }
@@ -62,12 +68,14 @@ console.log('data',data.user_id,
          setDescription('');
          setImage('');
          setimageBase64('');
+         setCreateLoading(false)
           Alert.alert('Success', response?.message);
           const response1 = await dispatch(getCommunities(data)).unwrap();
 console.log('response1',response1);
 
           // navigation.navigate('SplashBusiness2');
         } catch (err) {
+          setCreateLoading(false)
        //   setIsLoading(false);
           console.log('error', err);
 
@@ -204,7 +212,11 @@ console.log('response1',response1);
         </TouchableOpacity>
 
         <TouchableOpacity onPress={handleSave} style={styles.createButton}>
+          {
+            createloading?<ActivityIndicator size={20} color={COLORS.white}/>:
+          
           <Text style={styles.createButtonText}>Create Community</Text>
+}
         </TouchableOpacity>
       </View>
     </View>
