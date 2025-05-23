@@ -611,6 +611,7 @@ const ViewAllBusinesses = ({navigation}) => {
   const [categoriesItem, setCategoriesItem] = useState([]);
   const [location, setLocation] = useState(null);
   const [selectedFilters, setSelectedFilters] = useState({});
+const [isSortedAsc, setIsSortedAsc] = useState(true);
 
   // Fetch categories
   useEffect(() => {
@@ -669,6 +670,16 @@ const ViewAllBusinesses = ({navigation}) => {
       options: ['3 Stars & Above', '4 Stars & Above', '5 Stars Only'],
     },
   ];
+const handleSort = () => {
+  const sorted = [...businesses].sort((a, b) => {
+    if (a.name.toLowerCase() < b.name.toLowerCase()) return isSortedAsc ? -1 : 1;
+    if (a.name.toLowerCase() > b.name.toLowerCase()) return isSortedAsc ? 1 : -1;
+    return 0;
+  });
+
+  setBusinesses(sorted);
+  setIsSortedAsc(prev => !prev); // toggle sorting direction
+};
 
   // Handle search business
   const handleSearchBusiness = async () => {
@@ -788,14 +799,14 @@ console.log("daaaaa",data);
       if (typeof err === 'string') {
         // Handle string error
         console.error('Error:', err);
-        alert(err);
+        // alert(err);
       } else if (err && err.message) {
         // Handle object error with message property
         console.error('Error message:', err.message);
-        alert(err.message);
+        // alert(err.message);
       } else {
         console.error('Unhandled error:', err);
-        alert('An unknown error occurred.');
+        // alert('An unknown error occurred.');
       }
     }
   };
@@ -807,7 +818,7 @@ console.log("daaaaa",data);
       />
 
       <View style={styles.filterRow}>
-        <TouchableOpacity style={styles.filterButton}>
+        <TouchableOpacity style={styles.filterButton}  onPress={handleSort}>
           <Text style={styles.filterText}>↑↓ Sort</Text>
         </TouchableOpacity>
         <TouchableOpacity

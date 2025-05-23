@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import {Button} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -32,6 +33,7 @@ export default function SignInScreen({navigation}) {
 const dispatch=useDispatch()
 const { loading, error} = useSelector(state => state.api);
   const [flatTextSecureEntry, setFlatTextSecureEntry] = useState(true);
+  const[loader,setLoader]=useState(false)
   const handleUserName = text => {
     setUserName(text);
   };
@@ -47,6 +49,7 @@ const handleLogin = async () => {
     alert('Please enter password');
     return;
   }
+  setLoader(true)
   const data = {email: userName, password: password};
   try {
     const response = await dispatch(login(data)).unwrap();
@@ -74,8 +77,9 @@ const handleLogin = async () => {
    }else{
     Alert.alert('Alert','You are register as a Consumer')
    }
-    
+    setLoader(false)
   } catch (err) {
+    setLoader(false)
     if (typeof err === 'string') {
       // Handle string error
       console.error('Error:', err);
@@ -165,12 +169,24 @@ const handleLogin = async () => {
         <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
       </TouchableOpacity>
       <View style={{marginBottom: scale(60), marginTop: scale(40)}}>
+          {loader?
+        <View style={ {width: '90%',
+    paddingVertical: scale(5),
+    borderRadius: scale(8),
+    alignItems: 'center',
+    marginVertical: scale(8),
+    alignSelf:'center',
+    backgroundColor:COLORS.blue}}>
+          <ActivityIndicator size={25} color={COLORS.white}/>
+        </View>
+        :
         <ButtonComp
           title="Login"
           backgroundColor={COLORS.blue}
          onPress={() => handleLogin()}
         //  onPress={() => navigation.navigate('SubscriptionPlans')}
         />
+}
       </View>
       <Text style={styles.orText}>- OR Continue with -</Text>
 

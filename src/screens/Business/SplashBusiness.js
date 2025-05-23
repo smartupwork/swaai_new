@@ -28,21 +28,23 @@ export default SplashBusiness
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+   justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
   },
   logo: {
     width: '80%',
+    height:'60%',
     resizeMode: 'contain',
+  //  backgroundColor:'pink'
   },
   txt: {
     fontSize: scale(20),
     fontFamily: 'Poppins-Bold',
     width: '80%',
     textAlign: 'center',
-    marginTop: scale(30),
-    fontWeight:'700'
+   // marginTop: scale(30),
+   // fontWeight:'700'
   },
   bottomSec: {
     // position: 'absolute',
@@ -51,7 +53,7 @@ const styles = StyleSheet.create({
   //  justifyContent: 'space-between',
     width: '100%',
     paddingHorizontal: scale(20),
-    marginTop: scale(50),
+    marginTop: scale(20),
     alignItems: 'center',
     alignSelf: 'center',
     
@@ -64,6 +66,7 @@ const styles = StyleSheet.create({
     color: COLORS.blue,
     fontFamily: 'Poppins-SemiBold',
     textAlign:'center',
-    alignSelf:'center'
+    alignSelf:'center',
+    fontSize:18
   },
 });

@@ -12,7 +12,7 @@ const SplashConsumer = ({navigation}) => {
         Shop with Purpose. Share with Intent. Find your Impact.
       </Text>
       <View style={styles.bottomSec}>
-        <Text style={styles.txtPre}>Prev</Text>
+        {/* <Text style={styles.txtPre}></Text> */}
         <TouchableOpacity
           onPress={() => navigation.navigate('SignInConsumerScreen')}>
           <Text style={styles.txtNext}>Get Started</Text>
@@ -33,6 +33,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: '80%',
+    height:'45%',
     resizeMode: 'contain',
   },
   txt: {
@@ -45,9 +46,11 @@ const styles = StyleSheet.create({
   bottomSec: {
     position: 'absolute',
     bottom: scale(50),
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    // flexDirection: 'row',
+     justifyContent: 'center',
+     alignItems:'center',
     width: '100%',
+
     paddingHorizontal: scale(20),
   },
   txtPre: {
@@ -57,5 +60,7 @@ const styles = StyleSheet.create({
   txtNext: {
     color: COLORS.green,
     fontFamily: 'Poppins-SemiBold',
+    fontSize:scale(16),
+    marginRight:12
   },
 });

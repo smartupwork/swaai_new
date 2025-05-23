@@ -245,7 +245,7 @@ useEffect(() => {
             innerCircleColor="#F4F4F4"
             centerLabelComponent={() => (
               <View style={styles.centerLabel}>
-                <Text style={styles.centerLabelSubtext}>Check Your Impact</Text>
+                {/* <Text style={styles.centerLabelSubtext}>Check Your Impact</Text> */}
               </View>
             )}
           />

@@ -191,7 +191,7 @@ function ConsumerTabNavigator() {
       <Tab.Screen
         name="SettingConsumerScreen"
         component={SettingConsumerScreen}
-        options={{tabBarLabel: 'Setting'}} // Custom label
+        options={{tabBarLabel: 'Settings'}} // Custom label
       />
     </Tab.Navigator>
   );
@@ -316,7 +316,7 @@ function BusinessTabNavigator() {
       <Tab.Screen
         name="SettingScreen"
         component={SettingScreen}
-        options={{tabBarLabel: 'Setting'}} // Custom label
+        options={{tabBarLabel: 'Settings'}} // Custom label
       />
     </Tab.Navigator>
   );

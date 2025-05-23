@@ -142,7 +142,7 @@ const handleSave = async address => {
       <View style={styles.section}>
         <Text
           onPress={() => navigation.navigate('ChatScreen')}
-          style={[styles.sectionTitle, {fontFamily: 'Poppins-Bold',fontWeight:'800'}]}>
+          style={[styles.sectionTitle, {fontFamily: 'Poppins-SemiBold'}]}>
           Personal
         </Text>
         <View style={{marginTop: scale(14)}}>
@@ -289,7 +289,7 @@ const styles = ScaledSheet.create({
   },
   header: {
     fontSize: '24@s',
-    fontWeight:'800',
+  //  fontWeight:'800',
     fontFamily: 'Poppins-Bold',
     marginVertical: '16@vs',
   },
@@ -297,9 +297,9 @@ const styles = ScaledSheet.create({
     marginBottom: '24@vs',
   },
   sectionTitle: {
-    fontWeight:'700',
+    //fontWeight:'700',
     fontSize: '16@s',
-    fontFamily: 'Poppins-Medium',
+    fontFamily: 'Poppins-SemiBold',
     color: '#202020',
     //  marginBottom: '8@vs',
   },
@@ -312,10 +312,10 @@ const styles = ScaledSheet.create({
   },
   label: {
     fontSize: '16@s',
-    fontFamily: 'Poppins-Regular',
-    color: '#000',
+    fontFamily: 'Poppins-SemiBold',
+    color: '#202020',
     flex: 1,
-    fontWeight:'600',
+    //fontWeight:'600',
   },
   value: {
     fontSize: '16@s',

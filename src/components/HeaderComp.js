@@ -8,11 +8,13 @@ import COLORS from '../constants/color';
 const HeaderComp = ({leftClick, rightClick, msgClick}) => {
   return (
     <View style={styles.headerCont}>
-      <TouchableOpacity onPress={leftClick}>
-        <FontAwesome name="navicon" size={18} color="#323232" />
+      <TouchableOpacity style={{width:'33%',}} onPress={leftClick}>
+        <FontAwesome name="" size={18} color="#323232" />
       </TouchableOpacity>
+      <View style={{width:'33%',}}>
       <Image source={images.headerLogo} style={styles.logoImg} />
-      <View style={{flexDirection: 'row', alignItems: 'center', gap: 5}}>
+     </View>
+      <View style={{flexDirection: 'row', alignItems: 'center',justifyContent:'flex-end', gap: 5,width:'33%',}}>
         {
           msgClick?
         
@@ -21,7 +23,7 @@ const HeaderComp = ({leftClick, rightClick, msgClick}) => {
         </TouchableOpacity>
 :<Text></Text>
         }
-        <TouchableOpacity onPress={rightClick}>
+        <TouchableOpacity  onPress={rightClick}>
           <Image source={images.headerLogo2} style={styles.rightImg} />
         </TouchableOpacity>
       </View>
@@ -36,10 +38,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     width: '100%',
     flexDirection: 'row',
-    alignItems: 'center',
+    
+   // alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: scale(12),
+   // paddingHorizontal: scale(12),
+    // backgroundColor:'pink'
   },
-  logoImg: {width: scale(44), height: scale(44), resizeMode: 'contain'},
-  rightImg: {width: scale(44), height: scale(44), resizeMode: 'contain'},
+  logoImg: {width: scale(77), height: scale(77), resizeMode: 'cover'},
+  rightImg: {width: scale(55), height: scale(55), resizeMode: 'contain'},
 });

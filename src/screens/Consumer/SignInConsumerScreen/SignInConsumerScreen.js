@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {View, Text, TouchableOpacity,TextInput, StyleSheet, Image, Alert} from 'react-native';
+import {View, Text, TouchableOpacity,TextInput, StyleSheet, Image, Alert, ActivityIndicator} from 'react-native';
 import { Button} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {ScaledSheet, moderateScale, scale} from 'react-native-size-matters';
@@ -23,6 +23,7 @@ export default function SignInConsumerScreen({navigation}) {
   const text = '';
       const[userName,setUserName]=useState("")
       const [password, setPassword] = useState("");
+       const[loader,setLoader]=useState(false)
      
       const {loading, error} = useSelector(state => state.api);
       const [flatTextSecureEntry,setFlatTextSecureEntry]=useState(true)
@@ -41,6 +42,7 @@ export default function SignInConsumerScreen({navigation}) {
           alert('Please enter password');
           return;
         }
+         setLoader(true)
        const data = {email: userName, password: password};
        try {
          const response = await dispatch(login(data)).unwrap();
@@ -56,7 +58,9 @@ export default function SignInConsumerScreen({navigation}) {
              }else{
               Alert.alert('Alert','Your have register as a Bussiness')
              }
+                setLoader(false)
    } catch (err) {
+       setLoader(false)
          if (typeof err === 'string') {
            // Handle string error
            console.error('Error:', err);
@@ -144,12 +148,24 @@ export default function SignInConsumerScreen({navigation}) {
         <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
       </TouchableOpacity>
       <View style={{marginBottom: scale(20), marginTop: scale(19)}}>
+          {loader?
+        <View style={ {width: '90%',
+    paddingVertical: scale(5),
+    borderRadius: scale(8),
+    alignItems: 'center',
+    marginVertical: scale(8),
+    alignSelf:'center',
+    backgroundColor:COLORS.green}}>
+          <ActivityIndicator size={25} color={COLORS.white}/>
+        </View>
+        :
         <ButtonComp
           title="Login"
           backgroundColor={COLORS.green}
           onPress={() => handleLogin()}
           // onPress={() => navigation.navigate('ConsumerTabNavigator')}
         />
+}
       </View>
       <Text style={styles.orText}>- OR Continue with -</Text>
 

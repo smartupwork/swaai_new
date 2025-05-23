@@ -21,11 +21,14 @@ export default SplashBusiness2
 const styles = StyleSheet.create({
     conainer:{
         flex:1,
-        backgroundColor:COLORS.white
+        backgroundColor:COLORS.white,
+        justifyContent:'center',
+        alignItems:'center'
     },
     img:{
         width:"100%",
         height:'100%',
-        resizeMode:'contain'
+        resizeMode:'contain',
+        alignSelf:'center'
     }
 })

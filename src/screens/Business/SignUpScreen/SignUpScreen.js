@@ -7,6 +7,11 @@ import {
   StyleSheet,
   Image,
   Alert,
+  SafeAreaView,
+  Modal,
+  Pressable,
+  ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import {Button} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -32,6 +37,9 @@ export default function SignUpScreen({navigation}) {
   const [confirmPass, setConfirmPass] = useState('');
   const [flatTextSecureEntry, setFlatTextSecureEntry] = useState(true);
   const [flatTextSecureEntryc, setFlatTextSecureEntryc] = useState(true);
+  const[isTC,setIsTC]=useState(false)
+    const [modalVisible, setModalVisible] = useState(false);
+const[loader,setLoder]=useState(false)
   const handleUserName = text => {
     setUserName(text);
   };
@@ -41,30 +49,41 @@ export default function SignUpScreen({navigation}) {
   const handleConfPassword = text => {
     setConfirmPass(text);
   };
+  
   const handleSignUp = async () => {
+setLoder(true)
     if (!userName) {
       alert('Please enter username or email');
+      setLoder(false)
       return;
     }
     if (!password) {
       alert('Please enter password');
+       setLoder(false)
       return;
     }
     if (!confirmPass) {
       alert('Please enter confirm password');
+       setLoder(false)
       return;
     }
     if (password !== confirmPass) {
       alert('Password and confirm password do not match');
+       setLoder(false)
       return;
     }
-
+if(!isTC){
+setModalVisible(true)
+ setLoder(false)
+return;
+}
     const data = {
       email: userName,
       role_id: 1,
       password: password,
       password_confirmation: confirmPass,
     };
+     setLoder(true)
     try {
       const response = await dispatch(signUp(data)).unwrap();
       console.log('response:', response);
@@ -72,9 +91,10 @@ export default function SignUpScreen({navigation}) {
       setPassword("")
       setConfirmPass("")
               Alert.alert('Success', 'User created successfully');
-      
+       setLoder(false)
       navigation.navigate('SignInScreen');
     } catch (err) {
+       setLoder(false)
       if (typeof err === 'string') {
         // Handle string error
         console.error('Error:', err);
@@ -91,6 +111,105 @@ export default function SignUpScreen({navigation}) {
   };
   return (
     <View style={styles.container}>
+      <SafeAreaView style={styles.centeredView}>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            // Alert.alert('Modal has been closed.');
+            // setModalVisible(!modalVisible);
+          }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+                <Text style={styles.modalText}>Terms and Condition</Text>
+                              <ScrollView>
+                              <Text style={{fontFamily:'Poppins-Medium',fontSize:14,paddingBottom:25,textAlign:'justify'}}>
+                                
+                              
+              {'\n'}{'\n'}
+              Last Updated: [December 2024]{'\n'}{'\n'}
+              Welcome to SWAAI ! By downloading, accessing, or using our app, you agree to comply with
+              and be bound by the following Terms and Conditions. If you do not agree, please do not use the
+              app.{'\n'}{'\n'}
+              1. Acceptance of Terms
+              These Terms and Conditions ("Terms") govern your use of SWAAI , including all features,
+              functionalities, and services offered.{'\n'}{'\n'}
+              2. User Eligibility
+              You must be at least 18 years old to use SWAAI. By using the app, you represent and warrant
+              that you meet this age requirement.{'\n'}{'\n'}
+              3. Prohibited Activities
+              When using SWAAI you agree not to engage in the following:{'\n'}
+              • Illegal Activity: Any activities that violate applicable laws, regulations, or third-party rights.{'\n'}
+              • Harmful Behavior: Harassment, discrimination, defamation, or spamming of other users.{'\n'}
+              • Content Violations: Uploading or sharing content that is obscene, offensive, or infringes on
+              intellectual property rights.{'\n'}
+              • Misrepresentation: False claims, deceptive profiles, or impersonating another individual or
+              entity.{'\n'}
+              • Data Exploitation: Collecting or storing personal information of other users without consent.{'\n'}
+              Violation of these terms may result in suspension or termination of your account.{'\n'}{'\n'}
+              4. User Content
+              You retain ownership of any content you submit, post, or display on SWAAI. However, by
+              submitting content, you grant us a worldwide, non-exclusive, royalty-free license to use, display,
+              and distribute your content in connection with the app's operation.
+              5. Privacy Policy
+              Our use of your information is governed by our Privacy Policy. Please review it to understand
+              our practices.{'\n'}{'\n'}
+              6. Account Security
+              You are responsible for maintaining the confidentiality of your account login information. Notify
+              us immediately of unauthorized access or use of your account.{'\n'}{'\n'}
+              7. Termination of Use
+              We reserve the right to terminate or suspend your access to SWAAI at our sole discretion,
+              without prior notice, for conduct that we deem to be in violation of these Terms or harmful to the
+              app, its users, or third parties.{'\n'}{'\n'}
+              8. Disclaimer of Warranties
+              SWAAI is provided "as is" without warranties of any kind, either express or implied. We do not
+              guarantee the accuracy, reliability, or availability of the app or its content.{'\n'}{'\n'}
+              9. Limitation of Liability
+              To the fullest extent permitted by law, SWAAI and its affiliates will not be liable for any indirect,
+              incidental, or consequential damages resulting from your use of the app.{'\n'}{'\n'}
+              10. Changes to Terms
+              We may update these Terms periodically. Continued use of the app after changes have been
+              made constitutes your acceptance of the new Terms{'\n'}{'\n'}
+              11. Community Guidelines{'\n'}
+              • Treat all users with professionalism and respect.{'\n'}
+              • Do not engage in spamming, offensive language, or posting inappropriate content.{'\n'}
+              • Users are encouraged to report violations through our in-app reporting feature.{'\n'}{'\n'}
+              12. Intellectual Property{'\n'}
+              • SWAAI owns all intellectual property rights to its software, design, and features.{'\n'}
+              • Users may not copy, modify, or distribute app content without authorization.{'\n'}
+              • If you believe your intellectual property rights have been infringed, contact us at [email
+              address] to file a DMCA request.{'\n'}{'\n'}
+              13. Payment and Subscription Terms{'\n'}
+              • Some features may require payment or subscription. Details will be provided in-app.{'\n'}
+              • Payments are non-refundable except as required by law.{'\n'}
+              • Automatic renewals apply unless canceled before the renewal date.{'\n'}{'\n'}
+              14. Dispute Resolution{'\n'}
+              • Governing Law: These Terms are governed by the laws of Massachusetts.{'\n'}
+              • Arbitration: Disputes will be resolved through binding arbitration in Massachusetts.{'\n'}
+              • Class Action Waiver: You waive your right to participate in class-action lawsuits.{'\n'}{'\n'}
+              15. Advertising and Sponsorship{'\n'}
+              SWAAI may display advertisements or sponsored content.{'\n'}
+              • We are not responsible for the accuracy or legality of advertised products or services.{'\n'}{'\n'}
+              16. Push Notifications and Marketing
+              By using SWAAI you consent to receive push notifications and marketing messages. You can
+              manage preferences in the app settings.{'\n'}{'\n'}
+              17. Accessibility
+              We strive to make SWAAI accessible to all users. If you encounter barriers, contact us at [email
+              address] for support.{'\n'}{'\n'}
+              18. Contact Us
+              For questions or concerns about these Terms, please contact us at [email)
+                                </Text></ScrollView>
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => {setModalVisible(!modalVisible);setIsTC(true);handleSignUp()}}>
+                <Text style={styles.textStyle}>Agree</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+       
+      </SafeAreaView>
       <Text style={styles.title}>Create an account</Text>
       <TextInputComp
         leftIcon="user"
@@ -167,12 +286,24 @@ export default function SignUpScreen({navigation}) {
         </Text>
       </TouchableOpacity>
       <View style={{marginBottom: scale(30), marginTop: scale(10)}}>
+        {loader?
+        <View style={ {width: '90%',
+    paddingVertical: scale(5),
+    borderRadius: scale(8),
+    alignItems: 'center',
+    marginVertical: scale(8),
+    alignSelf:'center',
+    backgroundColor:COLORS.blue}}>
+          <ActivityIndicator size={25} color={COLORS.white}/>
+        </View>
+        :
         <ButtonComp
           title="Create Account"
           backgroundColor={COLORS.blue}
           onPress={() => handleSignUp()}
         //  onPress={() => navigation.navigate('SplashBusiness')}
         />
+}
       </View>
       <Text style={styles.orText}>- OR Continue with -</Text>
 
@@ -296,5 +427,50 @@ const styles = ScaledSheet.create({
     marginHorizontal: '10@s',
     borderWidth: 1,
     borderColor: '#08A5F4',
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalView: {
+    width:'100%',
+    height:'100%',
+   // margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+    alignSelf:'flex-end',
+    paddingHorizontal:20
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginTop: 25,
+    textAlign: 'center',
+    fontFamily:'Poppins-SemiBold'
   },
 });
