@@ -18,11 +18,11 @@ const businessTypes = [
   {label: 'Other', color: '#08A5F4'},
 ];
 const businessTypeCategories = [
-  {label: 'Food & Beverage', value: '1'},
-  {label: 'Clothing & Accessories', value: '2'},
-  {label: 'Health, Wellness & Beauty', value: '3'},
-  {label: 'Service-Based', value: '4'},
-  {label: 'Arts, Media & Entertainment', value: '5'},
+  {label: 'Food & Beverage', value: 'food-beverage'},
+  {label: 'Clothing & Accessories', value: 'clothing-accessories'},
+  {label: 'Health, Wellness & Beauty', value: 'health-wellness-beauty'},
+  {label: 'Service-Based', value: 'service-based'},
+  {label: 'Arts, Media & Entertainment', value: 'arts-media-entertainment'},
 ];
 const SelectBusinessType = ({navigation}) => {
   const dispatch = useDispatch();
@@ -121,6 +121,7 @@ const SelectBusinessType = ({navigation}) => {
     const data = {
       user_id: id,
       cat_id: parseInt(selectedCat),
+      business_type:businessType,
       business_name: businessName,
       description: description,
       website_url: websiteUrl,
@@ -454,6 +455,10 @@ const SelectBusinessType = ({navigation}) => {
               <TouchableOpacity
                 style={styles.button}
                 onPress={() => {
+                  if(!businessType){
+                    alert("Please select Business Type")
+                    return
+                  }
                   if (!businessName) {
                     alert('Please enter Business Name ');
                     return;

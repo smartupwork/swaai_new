@@ -27,94 +27,143 @@ console.log('plans:', plans);
      useStripe();
 
 const handlePayment = async () => {
-  setLoader(true)
-  console.log('handlePayment');
-//  if (!cardDetails?.complete) {
-//    Alert.alert('Error', 'Please enter complete card details');
-//    return;
-//  }
-
-//  try {
-//    // Create a token
-//    const {token, error} = await createToken({
-//      type: 'Card',
-//      address: {
-//        city: 'San Francisco',
-//        country: 'US',
-//        line1: '510 Townsend St',
-//        postalCode: '94103',
-//        state: 'CA',
-//      },
-//    });
-
-//    if (error) {
-//      Alert.alert('Error', error.message);
-//      console.log('Error', error.message);
-     
-//    } else {
-//      // Send the token to your backend
-//      console.log('Generated Token:', token.id);
-//      Alert.alert('Token generated', `Token ID: ${token.id}`);
-//    }
-//  } catch (err) {
-//   console.log('Error', 'Something went wrong');
+  setLoader(true);
   
-//    Alert.alert('Error', 'Something went wrong');
-//  }
-const user = await AsyncStorage.getItem('user');
- const parsedUser = JSON.parse(user);
+  // Validate all required card fields
+  if (!paymentData?.cardNumber || !paymentData?.expirationDate || !paymentData?.securityCode) {
+    setLoader(false);
+    Alert.alert('Error', 'Please complete all card details');
+    return;
+  }
 
-const id = parsedUser.id;
+  try {
+    // 1. Create PaymentMethod with explicit type
+    const { paymentMethod, error } = await createPaymentMethod({
+      type: 'card', // Explicit payment method type (lowercase as per Stripe docs)
+      billingDetails: {
+        address: {
+          city: paymentData.city,
+          country: 'US',
+          line1: paymentData.billingAddress1,
+          line2: paymentData.billingAddress2,
+          postalCode: paymentData.postalCode,
+          state: paymentData.state,
+        },
+        email: paymentData.email, // Add if available
+        name: paymentData.name || 'Asdf', // Default to "Asdf" if not provided
+      },
+      card: {
+        number: paymentData.cardNumber.replace(/\s/g, ''), // Remove spaces
+        expMonth: parseInt(paymentData.expirationDate.split('/')[0]),
+        expYear: parseInt(paymentData.expirationDate.split('/')[1]),
+        cvc: paymentData.securityCode,
+      },
+    });
 
- 
-  // Use the token in your backend API call
-  await createSubscription(id);
+    if (error) {
+      setLoader(false);
+      Alert.alert('Payment Error', error.message || 'Failed to create payment method');
+      return;
+    }
+
+    // Validate payment method creation
+    if (!paymentMethod?.id || paymentMethod?.type !== 'card') {
+      setLoader(false);
+      Alert.alert('Error', 'Valid card payment method is required');
+      return;
+    }
+
+    console.log('PaymentMethod created:', {
+      id: paymentMethod.id,
+      type: paymentMethod.type
+    });
+    
+    // 2. Proceed with subscription
+    const user = await AsyncStorage.getItem('user');
+    const parsedUser = JSON.parse(user);
+    const id = parsedUser.id;
+
+    await createSubscription(
+      id, 
+      paymentMethod.id, 
+      paymentMethod.type, // 'card'
+      paymentData.price_id,
+      paymentData.product
+    );
+    
+  } catch (err) {
+    setLoader(false);
+    Alert.alert('Error', err.message || 'Payment processing failed');
+    console.error('Payment error:', err);
+  }
 };
-const createSubscription = async id => {
+
+const createSubscription = async (
+  userId, 
+  paymentMethodId, 
+  paymentMethodType,
+  priceId,
+  productName
+) => {
+  // Validate all required parameters
+  if (!userId || !paymentMethodId || !paymentMethodType || !priceId || !productName) {
+    setLoader(false);
+    Alert.alert('Validation Error', 'All payment details are required');
+    return;
+  }
+
   const body = JSON.stringify({
-    user_id: id,
-    price_id: selectedPriceId, // Use state value
-
-    product: selectedPlan, // Use state value
-    card_number: paymentData.cardNumber,
-    expiry_date: paymentData.expirationDate,
-    cvc: paymentData.securityCode,
-    zip_code: paymentData.postal_code,
-    billing_address1: paymentData.billingAddress1,
-    billing_address2: paymentData.billingAddress2,
-    city: paymentData.city,
-    state: paymentData.state,
-    postal_code: paymentData.postalCode,
+    user_id: userId,
+    price_id: priceId,
+    product: productName,
+    payment_method_id: paymentMethodId,
+    payment_method_type: paymentMethodType, // Explicitly send type
+    billing_details: {
+      address: {
+        city: paymentData.city,
+        state: paymentData.state,
+        postal_code: paymentData.postalCode,
+        line1: paymentData.billingAddress1,
+        line2: paymentData.billingAddress2 || '' // Handle optional field
+      },
+      name: paymentData.name || 'Asdf' // Default name
+    }
   });
-  console.log('Request Body:', body);
-  
-  const token = await AsyncStorage.getItem('token');
-console.log("tikm",token);
 
+  const token = await AsyncStorage.getItem('token');
+  
   try {
     const response = await fetch(
       'https://r6u.585.mytemp.website/api/create-subscription',
       {
         method: 'POST',
         headers: {
-          Accept: 'application/json',
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
         body,
-      },
+      }
     );
+
     const result = await response.json();
-    setLoader(false)
-    Alert.alert('Subscription', result.message, [{text: 'OK'}]);
-    navigation.navigate('SelectBusinessType')
-    console.log('Subscription Result:', result.message);
-  } catch (error) {
-    setLoader(false)
-    Alert.alert('Error', 'Something went wrong with the subscription.', [
-      {text: 'OK'},
+    
+    if (!response.ok) {
+      throw new Error(result.message || 'Subscription failed');
+    }
+
+    setLoader(false);
+    Alert.alert('Success', 'Subscription created successfully', [
+      {text: 'OK', onPress: () => navigation.navigate('SelectBusinessType')}
     ]);
-    console.error('Subscription Error:', error);
+    
+  } catch (error) {
+    setLoader(false);
+    Alert.alert('Subscription Error', 
+      error.message || 'Failed to create subscription. Please try again.');
+    console.error('Subscription Error:', {
+      error,
+      requestBody: body
+    });
   }
 };
   if (loading) {

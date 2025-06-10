@@ -198,13 +198,15 @@ useEffect(() => {
       />
 
       {/* Search Bar */}
-      <View style={styles.searchBar}>
-        <TextInput
-          placeholder="Search anything..."
-          placeholderTextColor="#A9A9A9"
-          style={styles.searchInput}
-        />
-      </View>
+    <TouchableOpacity onPress={()=>navigation.navigate("SearchConsumerScreen")} style={styles.searchBar}>
+                 {/* <TextInput
+                 editable={false}
+                   placeholder="Search anything..."
+                   placeholderTextColor="#A9A9A9"
+                   style={styles.searchInput}
+                 /> */}
+                 <Text  style={styles.searchInput}>Search anything...</Text>
+               </TouchableOpacity>
 
       {/* Greeting */}
       <View style={styles.greeting}>
@@ -256,7 +258,7 @@ useEffect(() => {
       <View style={{flex: 1, marginBottom: verticalScale(30)}}>
         <View style={styles.feature}>
           <Text style={styles.featureText}>Feature</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=>navigation.navigate("ViewAllBusinesses")}>
             <Text style={styles.featureLink}>Visit business profile {'>'}</Text>
           </TouchableOpacity>
         </View>
@@ -438,12 +440,19 @@ const styles = ScaledSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: '16@vs',
+    borderWidth:0.2,
+borderColor:'#A9A9A9',
+borderRadius:5,
+    paddingVertical:8,
+   // marginHorizontal:18,
+    backgroundColor:'#fff'
   },
   searchInput: {
     flex: 1,
     fontSize: '14@s',
     fontFamily: 'Poppins-Regular',
-    color: '#333',
+    color: '#A9A9A9',
+    paddingLeft:8
   },
   greeting: {
     marginBottom: '16@vs',

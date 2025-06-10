@@ -608,7 +608,11 @@ const ViewAllBusinesses = ({navigation}) => {
   const [activeFilter, setActiveFilter] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [businesses, setBusinesses] = useState([]);
-  const [categoriesItem, setCategoriesItem] = useState([]);
+  const [categoriesItem, setCategoriesItem] = useState([{label: 'Food & Beverage', value: 'food-beverage'},
+  {label: 'Clothing & Accessories', value: 'clothing-accessories'},
+  {label: 'Health, Wellness & Beauty', value: 'health-wellness-beauty'},
+  {label: 'Service-Based', value: 'service-based'},
+  {label: 'Arts, Media & Entertainment', value: 'arts-media-entertainment'},]);
   const [location, setLocation] = useState(null);
   const [selectedFilters, setSelectedFilters] = useState({});
 const [isSortedAsc, setIsSortedAsc] = useState(true);
@@ -618,7 +622,7 @@ const [isSortedAsc, setIsSortedAsc] = useState(true);
     const fetchCategories = async () => {
       try {
         const response = await dispatch(categories()).unwrap();
-        setCategoriesItem(response);
+        // setCategoriesItem(response);
       } catch (error) {
         console.error('Error fetching categories:', error);
         Alert.alert('Error', error.message || 'An unknown error occurred.');
@@ -659,7 +663,7 @@ const [isSortedAsc, setIsSortedAsc] = useState(true);
   const filterData = [
     {
       label: 'Category',
-      options: categoriesItem?.map(item => `${item.name}_${item.id}`) || [],
+      options: categoriesItem?.map(item => `${item.label}_${item.value}`) || [],
     },
     {
       label: 'Distance',
@@ -708,7 +712,7 @@ console.log("daaaaa",data);
       Alert.alert('Success', response?.message);
     } catch (err) {
       console.error('Error:', err);
-      Alert.alert('Error', err.message || 'An unknown error occurred.');
+      Alert.alert('Alert', err.message || 'An unknown error occurred.');
       setModalVisible(false);
       // setSelectedFilters({});
     }
@@ -814,7 +818,12 @@ console.log("daaaaa",data);
     <ScrollView contentContainerStyle={styles.container}>
       <HeaderComp
         leftClick={() => alert('heelo')}
-        rightClick={() => alert('heelo')}
+        rightClick={() => navigation.navigate('ConsumerTabNavigator', { 
+          screen: 'ProfileConsumerScreen' 
+        })}
+                // rightClick={() => navigation.navigate('ProfileConsumerScreen')}
+
+        // rightClick={() => alert('heelo')}
       />
 
       <View style={styles.filterRow}>
@@ -859,7 +868,7 @@ console.log("daaaaa",data);
               height: 70,
               marginRight: 15,
               borderRadius: 20,
-              backgroundColor: 'red',
+            backgroundColor: COLORS.gray2,
             }}
             source={{uri: item.image}}
           />

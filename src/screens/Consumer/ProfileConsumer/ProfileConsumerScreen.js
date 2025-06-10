@@ -24,6 +24,7 @@ import {getConsumerProfile, getUserMedia, insertImage} from '../../../redux/slic
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'react-native-image-picker';
 import RNFS from 'react-native-fs';
+import axios from 'axios';
 
 const profileConsumerScreen = ({navigation}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -35,11 +36,16 @@ const profileConsumerScreen = ({navigation}) => {
     const [profileDetail, setProfileDetail] = useState({});
   
  useEffect(() => {
-    const fetchProfileData = async () => {
+   
+
+    fetchProfileData();
+  }, [dispatch]);
+   const fetchProfileData = async () => {
      // setLoading(true);
       try {
         const response = await dispatch(getConsumerProfile()).unwrap();
         setProfileDetail(response?.data);
+        setSummary(response?.data?.summary_desc)
        console.log('response profile deail', response.data);
        
       } catch (error) {
@@ -49,9 +55,6 @@ const profileConsumerScreen = ({navigation}) => {
        // setLoading(false);
       }
     };
-
-    fetchProfileData();
-  }, [dispatch]);
   const recordVideo = () => {
     const options = {
       mediaType: 'video', // Set mediaType to 'video'
@@ -86,7 +89,7 @@ const profileConsumerScreen = ({navigation}) => {
       const response = await dispatch(getUserMedia()).unwrap();
       setMediaData(response?.data);
       setUserMedia(response?.data);
-      console.log('response', response.data);
+      console.log('response------', response.data);
       const videoUrl = response?.data.find(
         media => media.video_url !== null,
       )?.video_url;
@@ -142,6 +145,45 @@ const profileConsumerScreen = ({navigation}) => {
 
     fetchOffer();
   }, [dispatch]);
+    const [summary, setSummary] = useState('');
+  const [modalVisibleSummary, setModalVisibleSummary] = useState(false);
+  const [tempSummary, setTempSummary] = useState(summary);
+
+  const handleSaveSummary = async() => {
+    // setSummary(tempSummary);
+    // setModalVisibleSummary(false);
+    const user = await AsyncStorage.getItem('user');
+     const token = await AsyncStorage.getItem('token');
+   const uid = JSON.parse(user);
+let data = JSON.stringify({
+  "summary_desc": tempSummary
+});
+let config = {
+  method: 'patch',
+  maxBodyLength: Infinity,
+  url: `https://r6u.585.mytemp.website/api/users/summary/${uid?.id}`,
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+  data : data
+};
+axios.request(config)
+.then((response) => {
+  console.log(JSON.stringify(response.data));
+  Alert.alert("Success",response.data.message)
+   fetchProfileData();
+  setSummary(tempSummary);
+     setModalVisibleSummary(false);
+})
+.catch((error) => {
+  Alert.alert("Error",error.message)
+  console.log(error);
+  setSummary("");
+  setModalVisibleSummary(false);
+});
+  };
   const handleOffers = async () => {
     // setIsLoading(true);
     const user = await AsyncStorage.getItem('user');
@@ -224,10 +266,11 @@ const convertImageToBase64 = async imageUrl => {
     return null;
   }
 };
+const [loaderImage,setLoaderImage]=useState(false)
   // Handle Save Post
 const handleSave = async () => {
   try {
-    setIsLoading(true);
+    setLoaderImage(true);
 
     const user = await AsyncStorage.getItem('user');
     const id = JSON.parse(user);
@@ -263,13 +306,13 @@ const handleSave = async () => {
     setTitle('');
     setRedirectUrl('');
     setimageBase64('');
-    setIsLoading(false);
+    setLoaderImage(false);
 
     Alert.alert('Success', response?.message);
   } catch (err) {
     console.error('Error:', err);
 
-    setIsLoading(false);
+    setLoaderImage(false);
     setMediaId('');
     setDescription('');
     setTitle('');
@@ -307,7 +350,30 @@ const handleSave = async () => {
     <View style={styles.card}>
       {item.image_url ? (
         <TouchableOpacity
-          onPress={() => Linking.openURL(item.image_redirect_url || '')}>
+          // onPress={() => Linking.openURL(item.image_redirect_url || '')}>
+         
+onPress={async () => {
+  const url = item.image_redirect_url;
+
+  if (!url) {
+    Alert.alert('Invalid URL', 'No redirect URL provided.');
+    return;
+  }
+
+  try {
+    const supported = await Linking.canOpenURL(url);
+
+    if (supported) {
+      await Linking.openURL(url);
+    } else {
+      Alert.alert('Error', 'Cannot open the provided URL.');
+    }
+  } catch (error) {
+    Alert.alert('Error', 'Invalid  URL.');
+    console.error('Linking error:', error);
+  }
+}}
+>
           <Image
             source={{uri: item.image_url}}
             style={styles.imagePlaceholder}
@@ -565,14 +631,42 @@ if (!token) {
 
         {/* Personal Summary */}
         <TouchableOpacity
-          onPress={() => navigation.navigate('EditProfileScreen')}
+          // onPress={() => navigation.navigate('EditProfileScreen')}
+          onPress={() => setModalVisibleSummary(true)} 
           style={styles.summaryContainer}>
           <Text style={styles.summaryTitle}>Personal Summary/Description</Text>
-          <Text style={styles.summaryText}>
+         <Text style={styles.summaryText}>{profileDetail?.summary_desc?profileDetail?.summary_desc:"Click here to add Summary/Description"}</Text>
+          {/* <Text style={styles.summaryText}>
             Supporting family owned, small businesses. Avid thrifter.
-          </Text>
+          </Text> */}
         </TouchableOpacity>
-
+ <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisibleSummary}
+        onRequestClose={() => setModalVisibleSummary(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Edit Summary</Text>
+            <TextInput
+              style={styles.input}
+              value={tempSummary}
+              onChangeText={setTempSummary}
+              multiline
+              placeholder="Write something ..."
+              placeholderTextColor="#999"
+            />
+            <View style={styles.buttonRow}>
+              <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisibleSummary(false)}>
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.saveBtn} onPress={()=>handleSaveSummary()}>
+                <Text style={styles.saveText}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
         {/* About Me Section */}
         <Text style={styles.aboutTitle}>About me</Text>
         {/* <View style={styles.imageContainer}>
@@ -667,7 +761,14 @@ if (!token) {
                 // }
               />
               <View style={styles.editmodalButtons}>
-                <Button title="Save" onPress={handleSave} />
+                {
+                  loaderImage?
+                  <View>
+                    <ActivityIndicator size="small" color={COLORS.cyan}/>
+                    </View>
+                :
+                <Button disabled={loaderImage} title="Save" onPress={handleSave} />
+}
                 <Button
                   title="Cancel"
                   onPress={() => setModalVisible(false)}
@@ -916,6 +1017,60 @@ const styles = ScaledSheet.create({
   editmodalButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+   modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '85%',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
+    elevation: 10,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 12,
+    color: '#222',
+  },
+  input: {
+    height: 100,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 14,
+    textAlignVertical: 'top',
+    color: '#333',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 16,
+  },
+  cancelBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    marginRight: 10,
+  },
+  cancelText: {
+    color: '#999',
+    fontSize: 14,
+  },
+  saveBtn: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  saveText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 14,
   },
 });
 

@@ -184,7 +184,7 @@ export function ChatScreen({navigation, route}) {
   // Handle sending new messages
   const handleSend = async () => {
     if (inputText.trim() == '') return; // Don't send empty messages
-
+setInputText("")
     try {
       // Step 1: Create a new message object
       const newMessage = {
@@ -268,11 +268,15 @@ export function ChatScreen({navigation, route}) {
         onContentSizeChange={() =>
           flatListRef.current?.scrollToEnd({animated: true})
         }
+          keyboardShouldPersistTaps="handled"
+
       />
 
       {/* Input Box */}
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0} // Adjust this value based on your header height
+
         style={styles.inputContainer}>
         <TextInput
           style={styles.input}

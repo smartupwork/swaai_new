@@ -190,7 +190,7 @@ const handleLogin = async () => {
       </View>
       <Text style={styles.orText}>- OR Continue with -</Text>
 
-      <View style={styles.socialContainer}>
+      {/* <View style={styles.socialContainer}>
         <TouchableOpacity style={styles.imageCont}>
           <Image source={images.googleLogo} style={styles.socialIcon} />
         </TouchableOpacity>
@@ -200,7 +200,7 @@ const handleLogin = async () => {
         <TouchableOpacity style={styles.imageCont}>
           <Image source={images.facebookIcon} style={styles.socialIcon} />
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       <View style={styles.signupContainer}>
         <Text style={styles.signupText}>Create An Account</Text>

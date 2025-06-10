@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, useNavigation} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 
 import COLORS from '../constants/color';
 import {images} from '../assets/images';
-import {ActivityIndicator, Image, View} from 'react-native';
+import {ActivityIndicator, Alert, Image, Linking, View} from 'react-native';
 import {scale} from 'react-native-size-matters';
 import {
   SettingScreen,
@@ -39,6 +39,7 @@ import {
   BussinessCountryScreen,
   BussinessLanguageScreen,
   BussinessChatListingScreen,
+  PaymentWebView,
 } from '../screens/Business';
 import {
   CategoriesViewMore,
@@ -409,6 +410,11 @@ function AuthStack() {
         component={PaymentMethodScreen}
         options={{headerShown: false}}
       />
+       <Stack.Screen
+        name="PaymentWebView"
+        component={PaymentWebView}
+        options={{headerShown: false}}
+      />
       <Stack.Screen
         name="ConfirmSubscription"
         component={ConfirmSubscription}
@@ -585,6 +591,40 @@ function Main() {
   const [isLoading, setIsLoading] = useState(true); // To handle the loading state
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [initialRouteName, setInitialRouteName] = useState('');
+  // const navigation = useNavigation();
+
+  useEffect(() => {
+    const handleDeepLink = ({ url }) => {
+      console.log("Deep link received:", url);
+
+      if (url?.startsWith('myapp://payment-status')) {
+        const success = url.includes('success=true');
+        if (success) {
+          Alert.alert('✅ Payment Successful');
+                      setInitialRouteName('SignInScreen');
+
+          // navigation.navigate('Home'); // or your desired screen
+        } else {
+          Alert.alert('❌ Payment Failed');
+                      setInitialRouteName('SignInScreen');
+
+          // navigation.goBack(); // or any fallback
+        }
+      }
+    };
+
+    // Listen for incoming links
+    const subscription = Linking.addEventListener('url', handleDeepLink);
+
+    // Handle cold starts
+    Linking.getInitialURL().then(url => {
+      if (url) {
+        handleDeepLink({ url });
+      }
+    });
+
+    return () => subscription.remove();
+  }, []);
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -718,6 +758,11 @@ function Main() {
           component={PaymentMethodScreen}
           options={{headerShown: false}}
         />
+         <Stack.Screen
+        name="PaymentWebView"
+        component={PaymentWebView}
+        options={{headerShown: false}}
+      />
         <Stack.Screen
           name="ConfirmSubscription"
           component={ConfirmSubscription}

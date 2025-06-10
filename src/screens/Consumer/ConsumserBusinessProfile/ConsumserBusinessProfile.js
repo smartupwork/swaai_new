@@ -195,7 +195,8 @@ setReviewLoader(true)
           rate={1.0}
           volume={1.0}
           isMuted={false}
-          
+                  paused={true} // ✅ This disables autoplay
+
           resizeMode="cover"
           repeat={false}
 

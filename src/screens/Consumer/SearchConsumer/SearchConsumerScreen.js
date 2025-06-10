@@ -35,7 +35,11 @@ const SearchConsumerScreen = ({navigation}) => {
   const [activeFilter, setActiveFilter] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [businesses, setBusinesses] = useState([]);
-  const [categoriesItem, setCategoriesItem] = useState([]);
+  const [categoriesItem, setCategoriesItem] = useState([{label: 'Food & Beverage', value: 'food-beverage'},
+  {label: 'Clothing & Accessories', value: 'clothing-accessories'},
+  {label: 'Health, Wellness & Beauty', value: 'health-wellness-beauty'},
+  {label: 'Service-Based', value: 'service-based'},
+  {label: 'Arts, Media & Entertainment', value: 'arts-media-entertainment'},]);
   const [location, setLocation] = useState(null);
   const [selectedFilters, setSelectedFilters] = useState({});
 const [searchTxt,setSearchTxt]=useState('')
@@ -46,7 +50,9 @@ const [isSortedAsc, setIsSortedAsc] = useState(true);
     const fetchCategories = async () => {
       try {
         const response = await dispatch(categories()).unwrap();
-        setCategoriesItem(response);
+        console.log("rep",response);
+        
+        // setCategoriesItem(response);
       } catch (error) {
         console.error('Error fetching categories:', error);
         Alert.alert('Error', error.message || 'An unknown error occurred.');
@@ -97,7 +103,7 @@ const handleSort = () => {
   const filterData = [
     {
       label: 'Category',
-      options: categoriesItem?.map(item => `${item.name}_${item.id}`) || [],
+      options: categoriesItem?.map(item => `${item.label}_${item.value}`) || [],
     },
     {
       label: 'Distance',

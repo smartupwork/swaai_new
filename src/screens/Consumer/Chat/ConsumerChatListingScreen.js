@@ -3,6 +3,7 @@ import {View, Text, Image,TouchableOpacity, FlatList} from 'react-native';
 import {ScaledSheet, moderateScale} from 'react-native-size-matters';
 import { useDispatch } from 'react-redux';
 import { getChatList } from '../../../redux/slices/apiSlice';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const chatData = [
   {
@@ -65,8 +66,12 @@ const ConsumerChatListingScreen = ({navigation}) => {
     };
   return (
     <View style={styles.container}>
+      <View style={{flexDirection:'row',alignItems:'center',gap:8,marginBottom:8}}>
+         <TouchableOpacity style={{width:'33%',}} onPress={()=>navigation.goBack()}>
+                      <FontAwesome name="angle-left" size={28} color="#323232" />
+                    </TouchableOpacity>
       <Text style={styles.header}>Recent Chats</Text>
-      <FlatList
+   </View>   <FlatList
         data={chat}
         keyExtractor={item => item.id}
         renderItem={({item}) => (
@@ -79,7 +84,7 @@ const ConsumerChatListingScreen = ({navigation}) => {
             <View style={styles.chatInfo}>
               <View style={styles.chatHeader}>
                 <Text style={styles.chatName}>{item.name}</Text>
-                <Text style={styles.chatTime}>{item.time}</Text>
+                <Text style={styles.chatTime}>{item.updated_at}</Text>
               </View>
               <Text style={styles.chatMessage}>{item.last_message}</Text>
             </View>
@@ -109,7 +114,7 @@ const styles = ScaledSheet.create({
   header: {
     fontSize: '20@ms',
     fontWeight: 'bold',
-    marginBottom: '15@ms',
+    // marginBottom: '15@ms',
     color: '#000',
   },
   chatItem: {

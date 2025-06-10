@@ -11,7 +11,7 @@ import {scale, verticalScale} from 'react-native-size-matters';
 import Carousel from 'react-native-reanimated-carousel';
 import {images} from '../../../assets/images';
 
-const SavedScreen = () => {
+const SavedScreen = ({navigation}) => {
   const width = Dimensions.get('window').width;
 
   return (
@@ -42,7 +42,7 @@ const SavedScreen = () => {
         </View>
 
         {/* Footer Link */}
-        <TouchableOpacity style={styles.profileLink}>
+        <TouchableOpacity style={styles.profileLink} onPress={()=>navigation.navigate("ViewAllBusinesses")}>
           <Text style={styles.linkText}>Visit business profile </Text>
         </TouchableOpacity>
       </View>

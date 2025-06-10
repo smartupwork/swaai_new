@@ -185,8 +185,11 @@ const CategoriesViewMore = ({navigation}) => {
 
       <HeaderComp
         leftClick={() => alert('heelo')}
+         rightClick={() => navigation.navigate('ConsumerTabNavigator', { 
+          screen: 'ProfileConsumerScreen' 
+        })}
         //rightClick={() => alert('heelo')}
-        rightClick={() => alert('heelo')}
+        // rightClick={() => alert('heelo')}
       />
       {/* Search Bar */}
       <View style={styles.searchContainer}>

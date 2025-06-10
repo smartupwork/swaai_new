@@ -328,6 +328,7 @@ import {
   FlatList,
   Button,
   Linking,
+  ActivityIndicator
 } from 'react-native';
 import {ScaledSheet, s, vs} from 'react-native-size-matters';
 import {images} from '../../../assets/images';
@@ -345,7 +346,6 @@ import {
   updateProfile,
   userData,
 } from '../../../redux/slices/apiSlice';
-import {ActivityIndicator} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'react-native-image-picker';
 import axios from 'axios';
@@ -359,7 +359,11 @@ const EditBusiness = ({navigation}) => {
   const closeModal = () => setIsModalVisible(false);
   const [profileDetail, setProfileDetail] = useState([]);
   useEffect(() => {
-    const fetchProfileData = async () => {
+ 
+
+    fetchProfileData();
+  }, [dispatch]);
+     const fetchProfileData = async () => {
       console.log('profile');
 
       try {
@@ -377,9 +381,6 @@ const EditBusiness = ({navigation}) => {
         setIsLoading(false); // Stop loading
       }
     };
-
-    fetchProfileData();
-  }, [dispatch]);
   const recordVideo = () => {
     const options = {
       mediaType: 'video', // Set mediaType to 'video'
@@ -471,6 +472,45 @@ const EditBusiness = ({navigation}) => {
 
     fetchOffer();
   }, [dispatch]);
+      const [summary, setSummary] = useState('');
+  const [modalVisibleSummary, setModalVisibleSummary] = useState(false);
+  const [tempSummary, setTempSummary] = useState(summary);
+
+  const handleSaveSummary = async() => {
+    // setSummary(tempSummary);
+    // setModalVisibleSummary(false);
+    const user = await AsyncStorage.getItem('user');
+     const token = await AsyncStorage.getItem('token');
+   const uid = JSON.parse(user);
+let data = JSON.stringify({
+  "summary_desc": tempSummary
+});
+let config = {
+  method: 'patch',
+  maxBodyLength: Infinity,
+  url: `https://r6u.585.mytemp.website/api/users/summary/${uid?.id}`,
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+  data : data
+};
+axios.request(config)
+.then((response) => {
+  console.log(JSON.stringify(response.data));
+  Alert.alert("Success",response.data.message)
+   fetchProfileData();
+  setSummary(tempSummary);
+     setModalVisibleSummary(false);
+})
+.catch((error) => {
+  Alert.alert("Error",error.message)
+  console.log(error);
+  setSummary("");
+  setModalVisibleSummary(false);
+});
+  };
   const handleOffers = async () => {
     console.log("offerItem");
     
@@ -1031,12 +1071,49 @@ setofferLoading(false);
         </View>
 
         {/* Personal Summary/Description Section */}
-        <View style={styles.summaryContainer}>
+        {/* <View style={styles.summaryContainer}>
           <Text style={styles.summaryTitle}>Personal Summary/Description</Text>
           <Text style={styles.summaryText}>
             Supporting family owned, small businesses. Avid thrifter.
           </Text>
-        </View>
+        </View> */}
+         <TouchableOpacity
+                  // onPress={() => navigation.navigate('EditProfileScreen')}
+                  onPress={() => setModalVisibleSummary(true)} 
+                  style={styles.summaryContainer}>
+                  <Text style={styles.summaryTitle}>Personal Summary/Description</Text>
+                 <Text style={styles.summaryText}>{profileDetail?.summary_desc?profileDetail?.summary_desc:"Click here to add Summary/Description"}</Text>
+                  {/* <Text style={styles.summaryText}>
+                    Supporting family owned, small businesses. Avid thrifter.
+                  </Text> */}
+                </TouchableOpacity>
+         <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisibleSummary}
+                onRequestClose={() => setModalVisibleSummary(false)}>
+                <View style={styles.modalOverlay}>
+                  <View style={styles.modalContent}>
+                    <Text style={styles.modalTitle}>Edit Summary</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={tempSummary}
+                      onChangeText={setTempSummary}
+                      multiline
+                      placeholder="Write something ..."
+                      placeholderTextColor="#999"
+                    />
+                    <View style={styles.buttonRow}>
+                      <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisibleSummary(false)}>
+                        <Text style={styles.cancelText}>Cancel</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={styles.saveBtn} onPress={()=>handleSaveSummary()}>
+                        <Text style={styles.saveText}>Save</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </Modal>
         {/* Video Pitch Section */}
 
         {videoUri ? (
@@ -1051,9 +1128,12 @@ setofferLoading(false);
               source={{
                 uri: videoUri,
               }}
+                      paused={true} // ✅ This disables autoplay
+
               style={styles.videoPlaceholder}
               controls
               resizeMode="cover"
+              
             />
             <TouchableOpacity
               onPress={selectVideoSource}
@@ -1213,11 +1293,14 @@ setofferLoading(false);
               <View style={styles.editmodalButtons}>
                 {/* <Button title="Save" onPress={handleSave} /> */}
                 <TouchableOpacity 
+                disabled={saveloader}
   onPress={handleSave}
-  style={[styles.saveButtonContainer,{backgroundColor:saveloader?'#86b0e3':COLORS.blue}]}
+  style={[styles.saveButtonContainer,{backgroundColor:COLORS.blue}]}
 >
   {
-    saveloader? <Text style={[styles.saveButtonText1]}>Saving</Text>
+    saveloader?  <View>
+                    <ActivityIndicator size="small" color={COLORS.white}/>
+                    </View>
   :
   <Text style={styles.saveButtonText1}>Save</Text>
 }
@@ -1593,6 +1676,61 @@ const styles = ScaledSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+
+   modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '85%',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
+    elevation: 10,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 12,
+    color: '#222',
+  },
+  input: {
+    height: 100,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 14,
+    textAlignVertical: 'top',
+    color: '#333',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 16,
+  },
+  cancelBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    marginRight: 10,
+  },
+  cancelText: {
+    color: '#999',
+    fontSize: 14,
+  },
+  saveBtn: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  saveText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 14,
   },
 });
 

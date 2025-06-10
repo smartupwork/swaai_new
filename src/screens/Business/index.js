@@ -29,7 +29,7 @@ import SignUpScreen from "./SignUpScreen/SignUpScreen";
 import SplashBusiness from "./SplashBusiness";
 import SplashBusiness2 from "./SplashBusiness2";
 
-
+import PaymentWebView from "./PaymentScreens/PaymentWebView";
 export {
   SettingScreen,
   SearchScreen,
@@ -40,6 +40,7 @@ export {
   SelectBusinessType,
   ConfirmSubscription,
   PaymentMethodScreen,
+  PaymentWebView,
   SubscriptionPlans,
   ForgotPassword,
   SignUpScreen,

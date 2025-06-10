@@ -3,6 +3,7 @@ import {View, Text, Image, TouchableOpacity, FlatList} from 'react-native';
 import {ScaledSheet, moderateScale} from 'react-native-size-matters';
 import {useDispatch} from 'react-redux';
 import {getChatList} from '../../../redux/slices/apiSlice';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const chatData = [
   {
@@ -65,7 +66,13 @@ const BussinessChatListingScreen = ({navigation}) => {
   };
   return (
     <View style={styles.container}>
+           <View style={{flexDirection:'row',alignItems:'center',gap:8,marginBottom:8}}>
+     
       <Text style={styles.header}>Recent Chats</Text>
+       <TouchableOpacity style={{width:'33%',}} onPress={()=>navigation.goBack()}>
+              <FontAwesome name="angle-left" size={18} color="#323232" />
+            </TouchableOpacity>
+      </View>
       <FlatList
         data={chat}
         keyExtractor={item => item.id}
@@ -79,7 +86,7 @@ const BussinessChatListingScreen = ({navigation}) => {
             <View style={styles.chatInfo}>
               <View style={styles.chatHeader}>
                 <Text style={styles.chatName}>{item.name}</Text>
-                <Text style={styles.chatTime}>{item.time}</Text>
+                <Text style={styles.chatTime}>{item.updated_at}</Text>
               </View>
               <Text style={styles.chatMessage}>{item.last_message}</Text>
             </View>
@@ -109,7 +116,7 @@ const styles = ScaledSheet.create({
   header: {
     fontSize: '20@ms',
     fontWeight: 'bold',
-    marginBottom: '15@ms',
+    // marginBottom: '15@ms',
     color: '#000',
   },
   chatItem: {
@@ -117,12 +124,15 @@ const styles = ScaledSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
     padding: '10@ms',
+    borderWidth:0.2,
+    borderColor:'gray',
     borderRadius: '10@ms',
     marginBottom: '10@ms',
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowOffset: {width: 0, height: 1},
     elevation: 2,
+    // backgroundColor:'red'
   },
   avatar: {
     width: '50@ms',

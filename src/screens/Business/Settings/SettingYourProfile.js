@@ -248,7 +248,7 @@ if (isLoading) {
           onChangeText={text => setBusinessName(text)}
         />
         <TextInput
-        editable={false}
+        // editable={false}
           style={styles.input}
           placeholder="gmail@example.com"
           placeholderTextColor={COLORS.black}
