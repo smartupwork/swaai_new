@@ -424,7 +424,7 @@ const SelectBusinessType = ({navigation}) => {
                   Country
                 </Text>
                 <TextInput
-                  editable={false}
+                  // editable={false}
                   placeholder="Enter country"
                   placeholderTextColor="gray"
                   style={styles.input}

@@ -67,11 +67,11 @@ const BussinessChatListingScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
            <View style={{flexDirection:'row',alignItems:'center',gap:8,marginBottom:8}}>
-     
-      <Text style={styles.header}>Recent Chats</Text>
-       <TouchableOpacity style={{width:'33%',}} onPress={()=>navigation.goBack()}>
+      <TouchableOpacity style={{width:'33%',}} onPress={()=>navigation.goBack()}>
               <FontAwesome name="angle-left" size={18} color="#323232" />
             </TouchableOpacity>
+      <Text style={styles.header}>Recent Chats</Text>
+      
       </View>
       <FlatList
         data={chat}
@@ -102,6 +102,11 @@ const BussinessChatListingScreen = ({navigation}) => {
             )} */}
           </TouchableOpacity>
         )}
+        ListEmptyComponent={() => (
+    <View style={{padding: 20, alignItems: 'center'}}>
+      <Text style={{color: '#888', fontSize: 16}}>No conversations found.</Text>
+    </View>
+  )}
       />
     </View>
   );

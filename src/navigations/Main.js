@@ -601,12 +601,12 @@ function Main() {
         const success = url.includes('success=true');
         if (success) {
           Alert.alert('✅ Payment Successful');
-                      setInitialRouteName('SignInScreen');
+                setInitialRouteName('SignInScreen');
 
           // navigation.navigate('Home'); // or your desired screen
         } else {
           Alert.alert('❌ Payment Failed');
-                      setInitialRouteName('SignInScreen');
+            setInitialRouteName('SignInScreen');
 
           // navigation.goBack(); // or any fallback
         }
@@ -631,6 +631,7 @@ function Main() {
         // Retrieve user and token from AsyncStorage
         const user = await AsyncStorage.getItem('user');
         const token = await AsyncStorage.getItem('token');
+console.log("main user",user);
 
         if (user && token) {
           const parsedUser = JSON.parse(user);
@@ -638,7 +639,13 @@ function Main() {
           // Check role_id to determine user type
           if (parsedUser.role_id === 1) {
             setUserType('business');
+       const isSubscribed = await AsyncStorage.getItem('isSubscribed');
+console.log(isSubscribed);
+
+            if(parsedUser.is_Subscribed == 1||isSubscribed==1)
             setInitialRouteName('BusinessTabNavigator');
+          else
+          setInitialRouteName('SignInScreen')
           } else {
             setUserType('consumer');
             setInitialRouteName('ConsumerTabNavigator');

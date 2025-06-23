@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,7 @@ import Collapsible from 'react-native-collapsible';
 import Icon from 'react-native-vector-icons/Ionicons'; // For dropdown icons
 import { getSavedBusinesses, savedBusinesses } from '../../../redux/slices/apiSlice';
 import { useDispatch } from 'react-redux';
+import { useFocusEffect } from '@react-navigation/native';
 
 const businesses = [
   {category: 'Arts & Crafts', name: "Kate's Craft's & Co.", id: 1},
@@ -32,10 +33,14 @@ const SavedConsumerScreen = ({navigation}) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [businessDetail, setBusinessDetail] = useState([]);
   const dispatch = useDispatch();
-  useEffect(() => {
+useFocusEffect(
+  useCallback(() => {
     fetchData();
-  }, [dispatch]);
+  }, [dispatch])
+);
   const fetchData = async () => {
+    console.log("call fetch");
+    
     try {
       const response1 = await dispatch(getSavedBusinesses()).unwrap();
       setBusinessDetail(response1)
@@ -112,13 +117,16 @@ const SavedConsumerScreen = ({navigation}) => {
         // leftClick={() => alert('heelo')}
         //rightClick={() => alert('heelo')}
         // rightClick={() => alert('heelo')}
+                rightClick={() => navigation.navigate('ProfileConsumerScreen')}
+
       />
 
       {/* Sort and Filter */}
       <View style={styles.filterRow}>
-        <TouchableOpacity style={styles.filterButton}>
+        <Text></Text>
+        {/* <TouchableOpacity style={styles.filterButton}>
           <Text style={styles.filterText}>↑↓ Sort</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
           onPress={() => setModalVisible(true)}
           style={[
@@ -175,7 +183,7 @@ const SavedConsumerScreen = ({navigation}) => {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() =>
-                navigation.navigate('ConsumserBusinessProfile', {id: item.id})
+                navigation.navigate('ConsumserBusinessProfile', {id: item.id,category:item.category})
               }
               style={styles.visitButton}>
               <Text style={styles.visitText}>Visit</Text>

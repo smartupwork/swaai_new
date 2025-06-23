@@ -247,14 +247,17 @@ console.log("daaaaa",data);
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <HeaderComp
-        leftClick={() => alert('heelo')}
-        rightClick={() => alert('heelo')}
+        // leftClick={() => alert('heelo')}
+        // rightClick={() => alert('heelo')}
+                rightClick={() => navigation.navigate('EditBusiness')}
+
       />
 
       <View style={styles.filterRow}>
-        <TouchableOpacity style={styles.filterButton} onPress={handleSort}>
+        <Text></Text>
+        {/* <TouchableOpacity style={styles.filterButton} onPress={handleSort}>
           <Text style={styles.filterText}>↑↓ Sort</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
           onPress={() => {setModalVisible(true);setSelectedFilters({});setActiveFilter(null)}}
           style={[
@@ -324,7 +327,7 @@ style={{borderWidth:1,borderRadius:5,paddingVertical:8,borderColor:'gray',paddin
             <TouchableOpacity
               onPress={() =>{
                   handlesaveAnalytics(item.id);
-                navigation.navigate('ConsumserBusinessProfile', {id: item.id})
+                navigation.navigate('ConsumserBusinessProfile', {id: item.id,category:item.category})
               }}
               style={styles.visitButton}>
               <Text style={styles.visitText}>Visit</Text>

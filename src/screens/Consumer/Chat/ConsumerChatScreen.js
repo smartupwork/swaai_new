@@ -376,13 +376,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export function ConsumerChatScreen({navigation, route}) {
-  const uid = route.params.uid; // Receiver's ID
+  const uid = route?.params?.uid; // Receiver's ID
+  const bName=route?.params?.businessName
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const dispatch = useDispatch();
   const [userId, setUserId] = useState(null); // Logged-in user's ID
   const flatListRef = useRef(null); // Ref for FlatList
-
+const[name,setName]=useState("")
   // Fetch the logged-in user's ID from AsyncStorage
   useEffect(() => {
     const fetchUserId = async () => {
@@ -393,6 +394,7 @@ export function ConsumerChatScreen({navigation, route}) {
           const parsedUser = JSON.parse(user);
           console.log('Parsed user ID:', parsedUser.id); // Debug log
           setUserId(parsedUser.id); // Set the logged-in user's ID
+          setName(parsedUser.first_name)
         } else {
           console.error('No user found in AsyncStorage'); // Debug log
         }
@@ -528,10 +530,11 @@ setInputText("")
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <FontAwesome name="angle-left" size={scale(24)} color={COLORS.blue} />
         </TouchableOpacity>
-        <Text style={styles.txt}>John Fantasia</Text>
-        <TouchableOpacity>
+        <Text style={styles.txt}>{bName?bName:"Anonymous"}</Text>
+        <Text></Text>
+        {/* <TouchableOpacity>
           <Image source={images.headerLogo2} style={styles.rightImg} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       {/* Chat Messages */}

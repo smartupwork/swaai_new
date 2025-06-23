@@ -12,6 +12,9 @@ import {
   View,
   Linking,
   LogBox,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import HeaderComp from '../../../components/HeaderComp';
@@ -53,7 +56,7 @@ const ConsumerBusinessProfile = ({navigation, route}) => {
 const[reviewLoader,setReviewLoader]=useState(false)
   const dispatch = useDispatch();
   const id = route.params?.id;
-
+const category=route?.params?.category
   // Fetch data on mount
   useEffect(() => {
     if (!id) {
@@ -69,6 +72,7 @@ const[reviewLoader,setReviewLoader]=useState(false)
           dispatch(getBusinessDetail(id)).unwrap(),
           dispatch(availOffer(id)).unwrap(),
         ]);
+console.log("busness detail",detailResponse);
 
         setBusinessDetail(detailResponse);
 
@@ -186,30 +190,32 @@ setReviewLoader(true)
       }
 
       return (
-        <Video
-          ref={videoRef}
-          source={{
-            uri: videoUrl,
-            type: videoUrl.split('.').pop() || 'mp4',
-          }}
-          rate={1.0}
-          volume={1.0}
-          isMuted={false}
-                  paused={true} // ✅ This disables autoplay
+      <Video
+  ref={videoRef}
+  source={{ uri: videoUrl }}
+  rate={1.0}
+  volume={1.0}
+  isMuted={false}
+  resizeMode="cover"
+  shouldPlay={false} // Autoplay disabled
+  isLooping={false}
+  useNativeControls={true}  // ✅ ADD THIS LINE
+  controls
+  style={{
+    width: '90%',
+    alignSelf: 'center',
+    marginVertical: 10,
+    height: 200,
+  }}
+  onPlaybackStatusUpdate={status => {
+    if (status.isPlaying) handleAnalytics('video_play');
+  }}
+  onError={error => {
+    console.error('Video error:', error);
+    Alert.alert('Error', 'Failed to play video');
+  }}
+/>
 
-          resizeMode="cover"
-          repeat={false}
-
-          shouldPlay
-          
-          isLooping={false}
-          style={{width: '90%',alignSelf:'center',marginVertical:10, height: 200}}
-          onPlay={() => handleAnalytics('video_play')}
-          onError={error => {
-            console.error('Video error:', error);
-            Alert.alert('Error', 'Failed to play video');
-          }}
-        />
       );
     } catch (error) {
       console.error('Video render error:', error);
@@ -235,15 +241,15 @@ setReviewLoader(true)
       <ScrollView ref={scrollViewRef}>
         <View style={styles.headerCont}>
           <Image
-            source={{uri: businessDetail?.profile_image}}
+            source={businessDetail?.profile_image?{uri: businessDetail?.profile_image}:images.avatar}
             style={styles.headerImg}
           />
-          <View>
+          <View style={{alignItems:'center',justifyContent:'center'}}>
             <Text style={styles.headerTxt}>
               {businessDetail?.business?.name}
             </Text>
             <ImageBackground source={images.Violet} style={styles.VioletImg}>
-              <Text style={styles.viotetTxt}>Family-Owned</Text>
+              <Text style={styles.viotetTxt}>{category}</Text>
             </ImageBackground>
           </View>
           <Text></Text>
@@ -257,41 +263,26 @@ setReviewLoader(true)
             justifyContent: 'space-between',
             paddingHorizontal: scale(12),
             marginTop: scale(12),
+            marginBottom:scale(12)
           }}>
-          <View style={{gap: scale(8)}}>
+          <View style={{width:'65%',flexDirection:'row',justifyContent:'space-between'}}>
+<View style={{gap: scale(8),}}>
             <StarRating
               rating={rating}
               onChange={setRating}
               maxStars={5}
               starSize={19}
               starStyle={{width: scale(8)}}
-              style={{alignSelf: 'flex-end'}}
+              style={{}}
             />
             <TouchableOpacity
               onPress={() => setModalVisible(true)}
               style={styles.reviewBtn}>
               <Text style={styles.reviewTxt}>Review</Text>
             </TouchableOpacity>
-          </View>
-          <View style={{gap: scale(8)}}>
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate('ReviewBusinessProfile', {
-                  id: businessDetail?.business?.id,
-                })
-              }
-              style={styles.viewAllBtn}>
-              <Text style={styles.viewAllTxt}>View all →</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setChkInModalVisible(true)}
-              style={styles.checkInBtn}>
-              <Text style={styles.checkInTxt}>Check-in →</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={{paddingHorizontal: scale(12)}}>
-        <TouchableOpacity
+            </View>
+             {/* <TouchableOpacity
+        style={{backgroundColor:COLORS.blue,width:110,paddingHorizontal:8,borderRadius:8,paddingVertical:5,alignSelf:'center',}}
   onPress={async () => {
     const rawUrl = businessDetail?.business?.website_url;
     if (rawUrl) {
@@ -313,9 +304,82 @@ setReviewLoader(true)
     accessible={true}
     accessibilityRole="link"
   >
-    Visit Business Website
+    Visit Site
+  </Text>
+</TouchableOpacity> */}
+          </View>
+        <Text></Text>
+        </View>
+          <View style={{gap: scale(8),flexDirection:'row',justifyContent:'space-between',marginHorizontal:14,marginBottom:8}}>
+           
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('ReviewBusinessProfile', {
+                  id: businessDetail?.business?.id,
+                })
+              }
+              style={styles.viewAllBtn}>
+              <Text style={styles.viewAllTxt}>View all →</Text>
+            </TouchableOpacity>
+              <TouchableOpacity
+        style={{backgroundColor:COLORS.blue,width:110,paddingHorizontal:8,borderRadius:8,paddingVertical:5,alignSelf:'center',}}
+  onPress={async () => {
+    const rawUrl = businessDetail?.business?.website_url;
+    if (rawUrl) {
+      const url = rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`;
+      try {
+        handleAnalytics('click');
+        await Linking.openURL(url);
+      } catch (error) {
+        console.error('Failed to open URL:', error);
+        Alert.alert('Error', 'Unable to open the website.');
+      }
+    } else {
+      Alert.alert('Error', 'Website URL not available');
+    }
+  }}
+>
+  <Text
+    style={styles.businessAddress}
+    accessible={true}
+    accessibilityRole="link"
+  >
+    Visit Site
   </Text>
 </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setChkInModalVisible(true)}
+              style={styles.checkInBtn}>
+              <Text style={styles.checkInTxt}>Check-in →</Text>
+            </TouchableOpacity>
+          </View>
+        <View style={{paddingHorizontal: scale(12)}}>
+        {/* <TouchableOpacity
+        style={{backgroundColor:COLORS.blue,width:110,paddingHorizontal:8,borderRadius:8,paddingVertical:5,alignSelf:'center',}}
+  onPress={async () => {
+    const rawUrl = businessDetail?.business?.website_url;
+    if (rawUrl) {
+      const url = rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`;
+      try {
+        handleAnalytics('click');
+        await Linking.openURL(url);
+      } catch (error) {
+        console.error('Failed to open URL:', error);
+        Alert.alert('Error', 'Unable to open the website.');
+      }
+    } else {
+      Alert.alert('Error', 'Website URL not available');
+    }
+  }}
+>
+  <Text
+    style={styles.businessAddress}
+    accessible={true}
+    accessibilityRole="link"
+  >
+    Visit Site
+  </Text>
+</TouchableOpacity> */}
 
           <View style={styles.companySummary}>
             <Text style={styles.companySummaryTitle}>
@@ -400,6 +464,7 @@ setReviewLoader(true)
           onPress={() =>
             navigation.navigate('ConsumerChatScreen', {
               uid: businessDetail?.business?.user_id,
+              businessName:businessDetail?.business?.name
             })
           }
           style={styles.messageButton}>
@@ -413,7 +478,20 @@ setReviewLoader(true)
         animationType="slide"
         transparent={true}
         onRequestClose={() => setModalVisible(false)}>
-        <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback onPress={() => {
+    Keyboard.dismiss();
+    setModalVisible(false); // closes modal
+  }}>
+        {/* <View style={styles.modalOverlay}> */}
+           <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
+      >
+         <View style={styles.modalOverlay}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+
+      
           <View style={styles.reviewBox}>
             <Text style={styles.title}>Review</Text>
 
@@ -463,7 +541,11 @@ setReviewLoader(true)
 }
             </View>
           </View>
-        </View>
+            </TouchableWithoutFeedback>
+            </View>
+      </KeyboardAvoidingView>
+        {/* </View> */}
+          </TouchableWithoutFeedback>
       </Modal>
 
       <Modal
@@ -583,17 +665,18 @@ const styles = ScaledSheet.create({
     textAlign: 'center',
   },
   VioletImg: {
-    width: scale(128),
-    height: scale(24),
+    width: scale(138),
+    height: scale(26),
     resizeMode: 'contain',
     alignItems: 'center',
     justifyContent: 'center',
   },
   viotetTxt: {
-    fontSize: scale(10),
+    fontSize: scale(9),
     fontFamily: 'Poppins-SemiBold',
     color: COLORS.white,
     textAlign: 'center',
+    paddingBottom:scale(3)
   },
   reviewBtn: {
     borderWidth: 2,
@@ -601,7 +684,7 @@ const styles = ScaledSheet.create({
     borderRadius: scale(8),
     alignItems: 'center',
     width: scale(60),
-    alignSelf: 'flex-end',
+    // alignSelf: 'flex-end',
   },
   reviewTxt: {
     fontSize: scale(11),
@@ -639,12 +722,14 @@ const styles = ScaledSheet.create({
     borderColor: COLORS.white,
   },
   businessAddress: {
-    fontSize: scale(15),
+    fontSize: scale(12),
     fontFamily: 'Poppins-SemiBold',
-    color: '#333',
-    marginBottom: scale(6),
+    color: '#fff',
+    // marginBottom: scale(6),
     textAlign: 'center',
-    marginTop: scale(12),
+    // marginTop: scale(12),
+    paddingHorizontal:scale(12),
+
   },
   companySummary: {
     backgroundColor: COLORS.blue,

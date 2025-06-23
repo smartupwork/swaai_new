@@ -25,4 +25,5 @@ export const images = {
   sliderImg: require('./sliderImg.png'),
   ViewCommunityCard: require('./ViewCommunityCard.png'),
   Violet: require('./Violet.png'),
+  firstLogo:require('./firstLogo.png')
 };

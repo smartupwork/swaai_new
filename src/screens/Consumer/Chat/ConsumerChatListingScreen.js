@@ -100,6 +100,11 @@ const ConsumerChatListingScreen = ({navigation}) => {
             )} */}
           </TouchableOpacity>
         )}
+        ListEmptyComponent={() => (
+    <View style={{padding: 20, alignItems: 'center'}}>
+      <Text style={{color: '#888', fontSize: 16}}>No conversations found.</Text>
+    </View>
+  )}
       />
     </View>
   );

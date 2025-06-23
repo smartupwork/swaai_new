@@ -1029,10 +1029,11 @@ const MyFeed = () => {
           />
         </View>
         <View style={styles.actionRow}>
-          <TouchableOpacity style={styles.dropdown}>
+          <Text></Text>
+          {/* <TouchableOpacity style={styles.dropdown}>
             <Icon name="document-text-outline" size={20} color="#757575" />
             <Text style={styles.dropdownText}>Add your post in </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity
             onPress={handlePublishPost}
             style={styles.publishButton}>

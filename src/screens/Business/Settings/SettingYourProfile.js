@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
   Alert,
+  Linking,
 } from 'react-native';
 import {ScaledSheet, moderateScale, scale} from 'react-native-size-matters';
 import COLORS from '../../../constants/color';
@@ -17,6 +18,8 @@ import { ActivityIndicator } from 'react-native-paper';
 import { profile, updateProfile } from '../../../redux/slices/apiSlice';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { useFocusEffect } from '@react-navigation/native';
 const SettingYourProfile = ({navigation}) => {
 
 const dispatch = useDispatch();
@@ -29,8 +32,12 @@ const[bussinessAddress,setbussinessAddress]=useState("")
 const[bID,setBID]=useState("")
  const[imageUri,setImageUri]=useState("")
   const[imageBase64,setImageBase64]=useState("")
-useEffect(() => {
-  const fetchProfileData = async () => {
+useFocusEffect(
+  useCallback(() => {
+    fetchProfileData();
+  }, [dispatch])
+);
+ const fetchProfileData = async () => {
     console.log("profile");
     
     try {
@@ -60,9 +67,6 @@ useEffect(() => {
       setIsLoading(false); // Stop loading
     }
   };
-
-  fetchProfileData();
-}, [dispatch]);
  const convertImageToBase64 = async imageUrl => {
    try {
      const response = await fetch(imageUrl);
@@ -126,6 +130,7 @@ const handleProfileChanges = async () => {
     // Dispatch API call
     const response = await dispatch(updateProfile(data)).unwrap();
     console.log('Response:', response);
+                  await AsyncStorage.setItem('userPic', `https://r6u.585.mytemp.website/public/${response?.user?.profile_image}`);
 
     Alert.alert('Success', response?.message);
   } catch (err) {
@@ -202,6 +207,87 @@ const openGallery = () => {
     },
   );
 };
+const [user, setUser] = useState(null);
+
+useEffect(() => {
+  const fetchUser = async () => {
+    const storedUser = await AsyncStorage.getItem('user');
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+    }
+  };
+  fetchUser();
+}, []);
+const handleCreateBillingPortal = async () => {
+  try {
+    // Optional: Start loader
+    // setIsLoading(true);
+
+    const token = await AsyncStorage.getItem('token');
+    const user = await AsyncStorage.getItem('user');
+console.log(token,user);
+
+    if (!token || !user) {
+      console.error('Token or user not found in storage');
+      Alert.alert('Error', 'User session not found. Please log in again.');
+      return;
+    }
+
+    const id = JSON.parse(user);
+    if (!id?.id) {
+      console.error("User ID is missing in stored user object.");
+      Alert.alert('Error', 'User ID is invalid.');
+      return;
+    }
+
+    const data = {
+      user_id: id.id
+    };
+
+    const config = {
+      method: 'post',
+      url: 'https://r6u.585.mytemp.website/api/create-billing-portal',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      data: data,
+    };
+
+    const response = await axios.request(config);
+    console.log("Billing portal response:", response.data);
+
+    const billingUrl = response?.data?.url;
+    if (!billingUrl) {
+      console.error("Billing portal URL not returned by server.");
+      Alert.alert('Error', 'Unable to get billing portal link. Please try again.');
+      return;
+    }
+
+    // Navigate to your screen with the billing portal URL
+    navigation.navigate('SavedPaymentMethod', { url: billingUrl });
+
+  } catch (error) {
+    if (error.response) {
+      console.error("Server error:", error.response.data);
+      Alert.alert('Server Error', error.response?.data?.message || 'Something went wrong on the server.');
+    } else if (error.request) {
+      console.error("No response received:", error.request);
+      Alert.alert('Error', 'No response from server. Please check your internet connection.');
+    } else if (error.message === 'Network Error') {
+      console.error("Network error:", error.message);
+      Alert.alert('Network Error', 'Please check your internet connection.');
+    } else {
+      console.error("Request setup error:", error.message);
+      Alert.alert('Error', 'Unexpected error occurred.');
+    }
+  } finally {
+    // Optional: Stop loader
+    // setIsLoading(false);
+  }
+};
 
 if (isLoading) {
   return (
@@ -272,14 +358,18 @@ if (isLoading) {
         />
 
         {/* Payment Methods */}
-        
+         {!user?.is_reviewed == 1 && (
         <TouchableOpacity
-          onPress={() => navigation.navigate('SavedPaymentMethod')}
+          onPress={handleCreateBillingPortal}
+
+          // onPress={() => navigation.navigate('SavedPaymentMethod')}
           style={styles.paymentMethod}>
           <Text style={styles.paymentText}>Payment methods</Text>
           <Text style={styles.arrow}>{'>'}</Text>
         </TouchableOpacity>
+)}
       </View>
+         
 
       {/* Save Changes Button */}
       <View

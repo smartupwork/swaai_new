@@ -9,6 +9,7 @@ import {
   Modal,
   Pressable,
   Alert,
+  Linking
 } from 'react-native';
 import {scale, ScaledSheet} from 'react-native-size-matters';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Replace with your preferred library
@@ -18,6 +19,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import AddressUpdateModal from '../../../components/AddressUpdateModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { profile, updateAddress } from '../../../redux/slices/apiSlice';
+import axios from 'axios';
 
 const SettingScreen = ({navigation}) => {
  
@@ -129,7 +131,137 @@ const handleSave = async address => {
            fetchSelectedCountry();
          }, []),
        );
+       const [user, setUser] = useState(null);
 
+useEffect(() => {
+  const fetchUser = async () => {
+    const storedUser = await AsyncStorage.getItem('user');
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+    }
+  };
+  fetchUser();
+}, []);
+const handleCreateBillingPortal = async () => {
+  try {
+    // Optional: Start loader
+    // setIsLoading(true);
+
+    const token = await AsyncStorage.getItem('token');
+    const user = await AsyncStorage.getItem('user');
+console.log(token,user);
+
+    if (!token || !user) {
+      console.error('Token or user not found in storage');
+      Alert.alert('Error', 'User session not found. Please log in again.');
+      return;
+    }
+
+    const id = JSON.parse(user);
+    if (!id?.id) {
+      console.error("User ID is missing in stored user object.");
+      Alert.alert('Error', 'User ID is invalid.');
+      return;
+    }
+
+    const data = {
+      user_id: id.id
+    };
+
+    const config = {
+      method: 'post',
+      url: 'https://r6u.585.mytemp.website/api/create-billing-portal',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      data: data,
+    };
+
+    const response = await axios.request(config);
+    console.log("Billing portal response:", response.data);
+
+    const billingUrl = response?.data?.url;
+    if (!billingUrl) {
+      console.error("Billing portal URL not returned by server.");
+      Alert.alert('Error', 'Unable to get billing portal link. Please try again.');
+      return;
+    }
+
+    // Navigate to your screen with the billing portal URL
+    navigation.navigate('SavedPaymentMethod', { url: billingUrl });
+
+  } catch (error) {
+    if (error.response) {
+      console.error("Server error:", error.response.data);
+      Alert.alert('Server Error', error.response?.data?.message || 'Something went wrong on the server.');
+    } else if (error.request) {
+      console.error("No response received:", error.request);
+      Alert.alert('Error', 'No response from server. Please check your internet connection.');
+    } else if (error.message === 'Network Error') {
+      console.error("Network error:", error.message);
+      Alert.alert('Network Error', 'Please check your internet connection.');
+    } else {
+      console.error("Request setup error:", error.message);
+      Alert.alert('Error', 'Unexpected error occurred.');
+    }
+  } finally {
+    // Optional: Stop loader
+    // setIsLoading(false);
+  }
+};
+
+const handleDelete = async() => {
+    const token = await AsyncStorage.getItem('token');
+    const user = await AsyncStorage.getItem('user');
+    const id = JSON.parse(user);
+    if (!token) {
+      throw new Error('Token not found');
+    }
+  Alert.alert(
+    'Are you sure?',
+    'This will delete your account.',
+    [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'OK',
+        onPress: async () => {
+          try {
+            const response = await axios.post(
+              `https://r6u.585.mytemp.website/api/deactivate-user/${id?.id}`,
+              {},
+              {
+                headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
+                         Authorization: `Bearer ${token}`,
+  },
+                maxBodyLength: Infinity,
+              },
+            );
+
+            console.log('✅ Deactivation Response:', response.data);
+            // Call your logout logic
+            logout();
+            navigation.reset({
+              index: 0,
+              routes: [{name: 'RoleScreen'}],
+            });
+          } catch (error) {
+            console.error('❌ Deactivation Error:', error);
+            Alert.alert('Error', 'Failed to deactivate account.');
+          }
+        },
+      },
+    ],
+    {cancelable: true},
+  );
+};
  const logout = async () => {
    await AsyncStorage.removeItem('user');
    await AsyncStorage.removeItem('token');
@@ -141,7 +273,7 @@ const handleSave = async address => {
       {/* Personal Section */}
       <View style={styles.section}>
         <Text
-          onPress={() => navigation.navigate('ChatScreen')}
+          // onPress={() => navigation.navigate('ChatScreen')}
           style={[styles.sectionTitle, {fontFamily: 'Poppins-SemiBold'}]}>
           Personal
         </Text>
@@ -172,16 +304,20 @@ const handleSave = async address => {
         onSave={handleSave}
       />
       {/* Payment Section */}
+       {!user?.is_reviewed == 1 && (
       <View style={styles.section}>
         <Text style={styles.darkText}>Payment</Text>
         <TouchableOpacity
-          onPress={() => navigation.navigate('SavedPaymentMethod')}
+          onPress={handleCreateBillingPortal}
+
+          // onPress={() => navigation.navigate('SavedPaymentMethod')}
           style={styles.row}>
           <Text style={styles.sectionTitle}>Payment methods</Text>
           <Icon name="chevron-right" size={20} color="#808080" />
         </TouchableOpacity>
         <View style={styles.separator} />
       </View>
+       )}
 
       {/* Country Section */}
       <View style={styles.section}>
@@ -235,6 +371,16 @@ const handleSave = async address => {
         </TouchableOpacity>
         <View style={styles.separator} />
       </View>
+        <View style={styles.section}>
+              <Text style={styles.darkText}>Delete Account</Text>
+              <TouchableOpacity
+              onPress={handleDelete}
+                style={styles.row}>
+                <Text style={styles.label}>Delete </Text>
+                <Text style={styles.value}> {'>'}</Text>
+              </TouchableOpacity>
+              <View style={styles.separator} />
+            </View>
       {/* Logout Section */}
             <View style={styles.section}>
               <Text style={styles.darkText}>Logout</Text>

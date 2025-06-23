@@ -314,7 +314,7 @@
 
 // export default EditBusiness;
 
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -328,7 +328,10 @@ import {
   FlatList,
   Button,
   Linking,
-  ActivityIndicator
+  ActivityIndicator,
+  PermissionsAndroid,
+  KeyboardAvoidingView,
+  Platform
 } from 'react-native';
 import {ScaledSheet, s, vs} from 'react-native-size-matters';
 import {images} from '../../../assets/images';
@@ -349,6 +352,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'react-native-image-picker';
 import axios from 'axios';
+import { useFocusEffect } from '@react-navigation/native';
 
 const EditBusiness = ({navigation}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -358,11 +362,11 @@ const EditBusiness = ({navigation}) => {
   const openModal = () => setIsModalVisible(true);
   const closeModal = () => setIsModalVisible(false);
   const [profileDetail, setProfileDetail] = useState([]);
-  useEffect(() => {
- 
-
+ useFocusEffect(
+  useCallback(() => {
     fetchProfileData();
-  }, [dispatch]);
+  }, [dispatch])
+);
      const fetchProfileData = async () => {
       console.log('profile');
 
@@ -888,67 +892,85 @@ setofferLoading(false);
 
   const [isUploading, setIsUploading] = useState(false); // State for upload progress
 
-  const requestCameraPermission = async () => {
+const requestCameraPermission = async () => {
+  if (Platform.OS === 'android') {
     try {
-      const granted = await PermissionsAndroid.request(
+      const cameraGranted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.CAMERA,
         {
           title: 'Camera Permission',
-          message: 'This app needs access to your camera to record videos.',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
+          message: 'App needs access to your camera to record videos.',
           buttonPositive: 'OK',
-        },
+        }
       );
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
+
+      const micGranted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+        {
+          title: 'Microphone Permission',
+          message: 'App needs access to your microphone to capture audio with video.',
+          buttonPositive: 'OK',
+        }
+      );
+
+      return (
+        cameraGranted === PermissionsAndroid.RESULTS.GRANTED &&
+        micGranted === PermissionsAndroid.RESULTS.GRANTED
+      );
     } catch (err) {
-      console.warn(err);
+      console.warn('Permission error:', err);
       return false;
     }
-  };
-
-  const selectVideoSource = async () => {
-    Alert.alert(
-      'Upload Video',
-      'Choose a source',
-      [
-        {
-          text: 'Record Video',
-          onPress: async () => {
-            const hasPermission = await requestCameraPermission();
-            if (hasPermission) {
-              launchCamera(
-                {
-                  mediaType: 'video',
-                  videoQuality: 'high',
-                  durationLimit: 15, // 15 seconds max duration
-                },
-                response => handleVideoResponse(response),
-              );
-            } else {
-              Alert.alert('Camera permission is required to record videos.');
-            }
-          },
-        },
-        {
-          text: 'Select from Gallery',
-          onPress: () => {
-            launchImageLibrary(
+  } else {
+    // iOS handles permissions via Info.plist
+    return true;
+  }
+};
+const selectVideoSource = async () => {
+  Alert.alert(
+    'Upload Video',
+    'Choose a source',
+    [
+      {
+        text: 'Record Video',
+        onPress: async () => {
+          const hasPermission = await requestCameraPermission();
+          if (hasPermission) {
+            launchCamera(
               {
                 mediaType: 'video',
+                videoQuality: 'high',
+                durationLimit: 15, // in seconds
               },
-              response => handleVideoResponse(response),
+              response => handleVideoResponse(response)
             );
-          },
+          } else {
+            Alert.alert(
+              'Permission Required',
+              'Camera and microphone permissions are required to record videos.'
+            );
+          }
         },
-        {
-          text: 'Cancel',
-          style: 'cancel',
+      },
+      {
+        text: 'Select from Gallery',
+        onPress: () => {
+          launchImageLibrary(
+            {
+              mediaType: 'video',
+            },
+            response => handleVideoResponse(response)
+          );
         },
-      ],
-      {cancelable: true},
-    );
-  };
+      },
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+    ],
+    {cancelable: true}
+  );
+};
 
   const handleVideoResponse = response => {
     if (response.didCancel) {
@@ -1052,17 +1074,17 @@ setofferLoading(false);
         {/* Profile Image Section */}
         <View style={styles.profileContainer}>
           <Image
-            source={{uri: profileDetail?.profile_image}}
+            source={profileDetail?.profile_image?{uri: profileDetail?.profile_image}:images.avatar}
             //source={images.avatar}
             style={styles.profileImage}
           />
-          <TouchableOpacity style={styles.editIcon}>
+          {/* <TouchableOpacity style={styles.editIcon}>
             <Text style={styles.editIconText}>✏️</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         {/* Business Address Section */}
         <View style={styles.addressContainer}>
-          <Text style={styles.addressLabel}>Business Address</Text>
+          <Text style={styles.addressLabel}>Website URL</Text>
           <TouchableOpacity
             onPress={openModal}
             style={styles.specialOfferButton}>
@@ -1081,7 +1103,9 @@ setofferLoading(false);
                   // onPress={() => navigation.navigate('EditProfileScreen')}
                   onPress={() => setModalVisibleSummary(true)} 
                   style={styles.summaryContainer}>
+                    {!profileDetail?.summary_desc && (
                   <Text style={styles.summaryTitle}>Personal Summary/Description</Text>
+                    )}
                  <Text style={styles.summaryText}>{profileDetail?.summary_desc?profileDetail?.summary_desc:"Click here to add Summary/Description"}</Text>
                   {/* <Text style={styles.summaryText}>
                     Supporting family owned, small businesses. Avid thrifter.
@@ -1229,6 +1253,10 @@ setofferLoading(false);
         {/* Modal for Editing */}
         <Modal visible={modalVisible} transparent>
           <View style={styles.editmodalContainer}>
+             <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{flex: 1,width:'100%', justifyContent: 'center'}}
+      >
             <View style={styles.editmodalContent}>
               <Text style={styles.editmodalTitle}>
                 {selectedItem ? 'Edit Post' : 'Add New Post'}
@@ -1294,7 +1322,7 @@ setofferLoading(false);
                 {/* <Button title="Save" onPress={handleSave} /> */}
                 <TouchableOpacity 
                 disabled={saveloader}
-  onPress={handleSave}
+  onPress={()=>handleSave()}
   style={[styles.saveButtonContainer,{backgroundColor:COLORS.blue}]}
 >
   {
@@ -1312,6 +1340,7 @@ setofferLoading(false);
                 />
               </View>
             </View>
+            </KeyboardAvoidingView>
           </View>
         </Modal>
       </ScrollView>
@@ -1644,6 +1673,7 @@ const styles = ScaledSheet.create({
     borderRadius: 8,
     padding: 20,
     width: '80%',
+    alignSelf:'center',
   },
   editmodalTitle: {
     fontSize: 18,

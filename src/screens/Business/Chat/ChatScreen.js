@@ -100,7 +100,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export function ChatScreen({navigation, route}) {
-  const uid = route.params.uid; // Receiver's ID
+  const uid = route?.params?.uid; // Receiver's ID
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const dispatch = useDispatch();

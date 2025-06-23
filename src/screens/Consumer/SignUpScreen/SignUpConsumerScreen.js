@@ -12,6 +12,10 @@ import {
   Modal,
   Pressable,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import {Button} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -112,6 +116,16 @@ return;
     };
 
   return (
+     <KeyboardAvoidingView
+    style={{flex: 1}}
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+    <TouchableWithoutFeedback 
+    // onPress={Keyboard.dismiss}
+    >
+      <ScrollView
+        contentContainerStyle={{flexGrow: 1}}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}>
     <View style={styles.container}>
       <SafeAreaView style={styles.centeredView}>
               <Modal
@@ -329,15 +343,19 @@ return;
         </TouchableOpacity>
       </View>
     </View>
+        </ScrollView>
+    </TouchableWithoutFeedback>
+  </KeyboardAvoidingView>
   );
 }
 
 const styles = ScaledSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
     // justifyContent: 'center',
     // paddingHorizontal: '20@s',
     backgroundColor: 'white',
+    // backgroundColor:'yellow'
   },
   title: {
     fontSize: '38@s',
@@ -346,6 +364,7 @@ const styles = ScaledSheet.create({
     marginBottom: '15@vs',
     marginTop: '30@vs',
     paddingHorizontal: scale(18),
+    // backgroundColor:'pink'
   },
 
   input: {

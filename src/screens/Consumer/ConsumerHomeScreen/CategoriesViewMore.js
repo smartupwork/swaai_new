@@ -202,7 +202,8 @@ const CategoriesViewMore = ({navigation}) => {
 
       {/* Recommended Section */}
       <Text style={styles.sectionTitle}>
-        Recommended for <Text style={styles.highlight}>{name}</Text>:
+        Recommended for <Text style={styles.highlight}>{name ? name : "you"}</Text>
+:
       </Text>
       {businesses?.recommended_businesses?.length == 0 ? (
         <View style={styles.cardContainer}>

@@ -115,9 +115,10 @@ const CheckInBusiness = ({navigation}) => {
 
       {/* Sort and Filter */}
       <View style={styles.filterRow}>
-        <TouchableOpacity style={styles.filterButton}>
+        <Text></Text>
+        {/* <TouchableOpacity style={styles.filterButton}>
           <Text style={styles.filterText}>↑↓ Sort</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
           onPress={() => setModalVisible(true)}
           style={[
@@ -172,14 +173,14 @@ const CheckInBusiness = ({navigation}) => {
               // }
               style={styles.visitButton}>
               <Text style={styles.visitText}>Save</Text>
-            </TouchableOpacity>
+            </TouchableOpacity>*/}
             <TouchableOpacity
               onPress={() =>
-                navigation.navigate('ConsumserBusinessProfile', {id: item.id})
+                navigation.navigate('ConsumserBusinessProfile', {id: item.id,category:item.category})
               }
               style={styles.visitButton}>
               <Text style={styles.visitText}>Visit</Text>
-            </TouchableOpacity> */}
+            </TouchableOpacity> 
           </View>
         </View>
       ))}

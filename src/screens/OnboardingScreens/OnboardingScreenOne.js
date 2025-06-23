@@ -12,7 +12,7 @@ setTimeout(() => {
   },[])
   return (
     <View style={styles.container}>
-      <Image source={images.splashLogo1} style={styles.image}/>
+      <Image source={images.firstLogo} style={styles.image}/>
     </View>
   )
 }
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent:"center",
     alignItems:'center', 
-       backgroundColor: '#EAFDFB',
+       backgroundColor: '#fff',
   },
   image:{
 width:'90%',

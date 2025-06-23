@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Modal,
   Pressable,
+  Alert,
 } from 'react-native';
 import {scale, ScaledSheet} from 'react-native-size-matters';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Replace with your preferred library
@@ -15,6 +16,7 @@ import COLORS from '../../../constants/color';
 import { useDispatch } from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 const SettingConsumerScreen = ({navigation}) => {
   const dispatch = useDispatch();
    const [selectedCountry, setSelectedCountry] = useState('United States');
@@ -46,6 +48,55 @@ const SettingConsumerScreen = ({navigation}) => {
         fetchSelectedCountry();
       }, []),
     );
+    const handleDelete = async() => {
+    const token = await AsyncStorage.getItem('token');
+    const user = await AsyncStorage.getItem('user');
+    const id = JSON.parse(user);
+    if (!token) {
+      throw new Error('Token not found');
+    }
+  Alert.alert(
+    'Are you sure?',
+    'This will delete your account.',
+    [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'OK',
+        onPress: async () => {
+          try {
+            const response = await axios.post(
+              `https://r6u.585.mytemp.website/api/deactivate-user/${id?.id}`,
+              {},
+              {
+                headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
+                         Authorization: `Bearer ${token}`,
+  },
+                maxBodyLength: Infinity,
+              },
+            );
+
+            console.log('✅ Deactivation Response:', response.data);
+            // Call your logout logic
+            logout();
+            navigation.reset({
+              index: 0,
+              routes: [{name: 'RoleScreen'}],
+            });
+          } catch (error) {
+            console.error('❌ Deactivation Error:', error);
+            Alert.alert('Error', 'Failed to deactivate account.');
+          }
+        },
+      },
+    ],
+    {cancelable: true},
+  );
+};
      const logout = async () => {
        await AsyncStorage.removeItem('user');
        await AsyncStorage.removeItem('token');
@@ -57,7 +108,7 @@ const SettingConsumerScreen = ({navigation}) => {
       {/* Personal Section */}
       <View style={styles.section}>
         <Text
-          onPress={() => navigation.navigate('ChatScreen')}
+          // onPress={() => navigation.navigate('ChatScreen')}
           style={[styles.sectionTitle, {fontFamily: 'Poppins-SemiBold'}]}>
           Personal
         </Text>
@@ -71,18 +122,18 @@ const SettingConsumerScreen = ({navigation}) => {
           </TouchableOpacity>
         </View>
         <View style={styles.separator} />
-        <View style={{marginTop: scale(14)}}>
+        {/* <View style={{marginTop: scale(14)}}>
           <Text style={styles.darkText}>Shipping</Text>
           <TouchableOpacity style={styles.row}>
             <Text style={styles.sectionTitle}>Shipping Address</Text>
             <Icon name="chevron-right" size={20} color="#808080" />
           </TouchableOpacity>
         </View>
-        <View style={styles.separator} />
+        <View style={styles.separator} /> */}
       </View>
 
       {/* Payment Section */}
-      <View style={styles.section}>
+      {/* <View style={styles.section}>
         <Text style={styles.darkText}>Payment</Text>
         <TouchableOpacity
         disabled
@@ -92,13 +143,14 @@ const SettingConsumerScreen = ({navigation}) => {
           <Icon name="chevron-right" size={20} color="#808080" />
         </TouchableOpacity>
         <View style={styles.separator} />
-      </View>
+      </View> */}
 
       {/* Country Section */}
+        <View style={styles.separator} />
       <Text
         // onPress={() => navigation.navigate('ChatScreen')}
-        style={[styles.sectionTitle, {fontFamily: 'Poppins-SemiBold'}]}>
-        Shop
+        style={[styles.sectionTitle, {fontFamily: 'Poppins-Bold'}]}>
+        Search
       </Text>
       <View style={styles.section}>
         <Text style={styles.darkText}>Country</Text>
@@ -152,6 +204,16 @@ const SettingConsumerScreen = ({navigation}) => {
         </TouchableOpacity>
         <View style={styles.separator} />
       </View>
+       <View style={styles.section}>
+                    <Text style={styles.darkText}>Delete Account</Text>
+                    <TouchableOpacity
+                    onPress={handleDelete}
+                      style={styles.row}>
+                      <Text style={styles.label}>Delete </Text>
+                      <Text style={styles.value}> {'>'}</Text>
+                    </TouchableOpacity>
+                    <View style={styles.separator} />
+                  </View>
       {/* Logout Section */}
       <View style={styles.section}>
         <Text style={styles.darkText}>Logout</Text>

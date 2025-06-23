@@ -1318,11 +1318,11 @@ const[communityMember,setCommunityMember]=useState([]);
         </View>
         <View style={styles.btnCont}>
           <View style={{flexDirection: 'row', alignItems: 'center', gap: 6}}>
-            <AntDesign name="earth" size={15} color="gray" />
-            <Text style={{fontSize: scale(13), color: 'gray'}}>
-              Add your post in
-            </Text>
-            <AntDesign name="down" size={15} color="gray" />
+            {/* <AntDesign name="earth" size={15} color="gray" /> */}
+            {/* <Text style={{fontSize: scale(13), color: 'gray'}}>
+              
+            </Text> */}
+            {/* <AntDesign name="down" size={15} color="gray" /> */}
           </View>
           <TouchableOpacity
             onPress={handlePublishPost}

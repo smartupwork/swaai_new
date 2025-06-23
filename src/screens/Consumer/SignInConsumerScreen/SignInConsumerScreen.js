@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {View, Text, TouchableOpacity,TextInput, StyleSheet, Image, Alert, ActivityIndicator} from 'react-native';
+import {View, Text, TouchableOpacity,TextInput, StyleSheet, Image, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, ScrollView} from 'react-native';
 import { Button} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {ScaledSheet, moderateScale, scale} from 'react-native-size-matters';
@@ -46,12 +46,23 @@ export default function SignInConsumerScreen({navigation}) {
        const data = {email: userName, password: password};
        try {
          const response = await dispatch(login(data)).unwrap();
+        
+         if (response?.user?.status==1) {
+          Alert.alert("Alert",'Your account has been deleted.')
+             setLoader(false)
+          return
+         }
+          await AsyncStorage.setItem('userPic', `https://r6u.585.mytemp.website/public/${response?.user?.profile_image}`);
+
            await AsyncStorage.setItem('user', JSON.stringify(response.user));
            await AsyncStorage.setItem('token', response.token);
          console.log('response:', response);
           setUserName('');
           setPassword('');
-          setPassword('');
+         
+           if(response?.user.is_reviewed==1){
+           navigation.reset({index: 0, routes: [{name: 'ConsumerTabNavigator'}]});
+         }
              if (response.user.role_id==2){
  navigation.reset({index: 0, routes: [{name: 'ConsumerTabNavigator'}]});
 // navigation.navigate('ConsumerTabNavigator')
@@ -76,6 +87,16 @@ export default function SignInConsumerScreen({navigation}) {
        }
      };
   return (
+         <KeyboardAvoidingView
+        style={{flex: 1}}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <TouchableWithoutFeedback
+        // onPress={Keyboard.dismiss}
+        >
+          <ScrollView
+            contentContainerStyle={{flexGrow: 1}}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}>
     <View style={styles.container}>
       <View
         style={{
@@ -189,12 +210,15 @@ export default function SignInConsumerScreen({navigation}) {
         </TouchableOpacity>
       </View>
     </View>
+     </ScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
   );
 }
 
 const styles = ScaledSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
     // justifyContent: 'center',
     // paddingHorizontal: '20@s',
     backgroundColor: 'white',

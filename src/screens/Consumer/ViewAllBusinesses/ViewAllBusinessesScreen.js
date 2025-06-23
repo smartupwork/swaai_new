@@ -827,9 +827,10 @@ console.log("daaaaa",data);
       />
 
       <View style={styles.filterRow}>
-        <TouchableOpacity style={styles.filterButton}  onPress={handleSort}>
+        <Text></Text>
+        {/* <TouchableOpacity style={styles.filterButton}  onPress={handleSort}>
           <Text style={styles.filterText}>↑↓ Sort</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
           onPress={() => {setModalVisible(true);setSelectedFilters({});setActiveFilter(null)}}
           style={[
@@ -890,7 +891,7 @@ console.log("daaaaa",data);
             <TouchableOpacity
               onPress={() =>{
                   handlesaveAnalytics(item.id);
-                navigation.navigate('ConsumserBusinessProfile', {id: item.id})
+                navigation.navigate('ConsumserBusinessProfile', {id: item.id,category:item.category})
               }}
               style={styles.visitButton}>
               <Text style={styles.visitText}>Visit</Text>

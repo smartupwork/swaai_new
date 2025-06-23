@@ -8,6 +8,10 @@ import {
   Image,
   Alert,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  ScrollView,
 } from 'react-native';
 import {Button} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -53,8 +57,17 @@ const handleLogin = async () => {
   const data = {email: userName, password: password};
   try {
     const response = await dispatch(login(data)).unwrap();
+     if (response?.user?.status==1) {
+              Alert.alert("Alert",'Your account has been deleted.')
+                 setLoader(false)
+              return
+             }
     console.log('response:', response);
+     await AsyncStorage.setItem('userPic', `https://r6u.585.mytemp.website/public/${response?.user?.profile_image}`);
     await AsyncStorage.setItem('user', JSON.stringify(response.user));
+       await AsyncStorage.setItem('isSubscribed', String(response.is_Subscribed));
+
+
     if (response?.business_id){
        await AsyncStorage.setItem(
         'business_id',
@@ -65,14 +78,39 @@ const handleLogin = async () => {
     await AsyncStorage.setItem('token', response.token);
      setUserName('');
      setPassword('');
+      if(response?.user.is_reviewed==1){
+                navigation.reset({index: 0, routes: [{name: 'SplashBusiness2'}]});
+                return
+              }
    //  navigation.reset({index: 0, routes: [{name: 'SubscriptionPlans'}]});
    if (response?.user?.role_id==1){
  if (response?.is_Subscribed == 1) {
+  if(response?.subscription_status=="active"){
        if (response?.businesses_created == 1) {
          navigation.navigate('SplashBusiness2');
        } else {
          navigation.navigate('SelectBusinessType');
        }
+      }
+      else{
+         Alert.alert(
+    'Previous Payment Status',
+      `${response?.status_message}`,
+    [
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {
+        text: 'OK',
+        onPress: () => console.log('OK Pressed'),
+      },
+    ],
+    { cancelable: false }
+  );
+  navigation.navigate('SubscriptionPlans')
+      }
      } else navigation.navigate('SubscriptionPlans');
    }else{
     Alert.alert('Alert','You are register as a Consumer')
@@ -97,6 +135,16 @@ const handleLogin = async () => {
 
 
   return (
+    <KeyboardAvoidingView
+        style={{flex: 1}}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <TouchableWithoutFeedback
+        // onPress={Keyboard.dismiss}
+        >
+          <ScrollView
+            contentContainerStyle={{flexGrow: 1}}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}>
     <View style={styles.container}>
       <View
         style={{
@@ -209,12 +257,15 @@ const handleLogin = async () => {
         </TouchableOpacity>
       </View>
     </View>
+     </ScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
   );
 }
 
 const styles = ScaledSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
     // justifyContent: 'center',
     // paddingHorizontal: '20@s',
     backgroundColor: 'white',

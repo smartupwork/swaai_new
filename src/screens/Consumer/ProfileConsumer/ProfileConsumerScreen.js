@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,8 @@ import {
   Button,
   Linking,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import {ScaledSheet, scale} from 'react-native-size-matters';
 import {images} from '../../../assets/images';
@@ -25,6 +27,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'react-native-image-picker';
 import RNFS from 'react-native-fs';
 import axios from 'axios';
+import { useFocusEffect } from '@react-navigation/native';
 
 const profileConsumerScreen = ({navigation}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -34,12 +37,11 @@ const profileConsumerScreen = ({navigation}) => {
   const openModal = () => setIsModalVisible(true);
   const closeModal = () => setIsModalVisible(false);
     const [profileDetail, setProfileDetail] = useState({});
-  
- useEffect(() => {
-   
-
+useFocusEffect(
+  useCallback(() => {
     fetchProfileData();
-  }, [dispatch]);
+  }, [dispatch])
+);
    const fetchProfileData = async () => {
      // setLoading(true);
       try {
@@ -630,16 +632,19 @@ if (!token) {
         </View>
 
         {/* Personal Summary */}
-        <TouchableOpacity
-          // onPress={() => navigation.navigate('EditProfileScreen')}
-          onPress={() => setModalVisibleSummary(true)} 
-          style={styles.summaryContainer}>
-          <Text style={styles.summaryTitle}>Personal Summary/Description</Text>
-         <Text style={styles.summaryText}>{profileDetail?.summary_desc?profileDetail?.summary_desc:"Click here to add Summary/Description"}</Text>
-          {/* <Text style={styles.summaryText}>
-            Supporting family owned, small businesses. Avid thrifter.
-          </Text> */}
-        </TouchableOpacity>
+       <TouchableOpacity
+  onPress={() => setModalVisibleSummary(true)} 
+  style={styles.summaryContainer}>
+
+  {!profileDetail?.summary_desc && (
+    <Text style={styles.summaryTitle}>Personal Summary/Description</Text>
+  )}
+
+  <Text style={styles.summaryText}>
+    {profileDetail?.summary_desc || "Click here to add Summary/Description"}
+  </Text>
+</TouchableOpacity>
+
  <Modal
         animationType="slide"
         transparent={true}
@@ -699,6 +704,10 @@ if (!token) {
         {/* Modal for Editing */}
         <Modal visible={modalVisible} transparent>
           <View style={styles.editmodalContainer}>
+              <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    style={{flex: 1,width:'100%', justifyContent: 'center'}}
+                  >
             <View style={styles.editmodalContent}>
               <Text style={styles.editmodalTitle}>
                 {selectedItem ? 'Edit Post' : 'Add New Post'}
@@ -776,6 +785,7 @@ if (!token) {
                 />
               </View>
             </View>
+            </KeyboardAvoidingView>
           </View>
         </Modal>
         {/* More Actions */}
@@ -999,6 +1009,7 @@ const styles = ScaledSheet.create({
     borderRadius: 8,
     padding: 20,
     width: '80%',
+     alignSelf:'center',
   },
   editmodalTitle: {
     fontSize: 18,

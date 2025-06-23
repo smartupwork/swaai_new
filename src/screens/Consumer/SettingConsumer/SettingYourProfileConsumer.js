@@ -517,8 +517,9 @@ const SettingYourProfileConsumer = ({navigation}) => {
         const response = await dispatch(
           updateConsumerProfile(updatedData),
         ).unwrap();
-        console.log(response);
-        
+        console.log("update ",response);
+                  await AsyncStorage.setItem('userPic', `https://r6u.585.mytemp.website/public/${response?.user?.profile_image}`);
+
            await AsyncStorage.setItem('user', JSON.stringify(response.user));
         Alert.alert('Success', response?.message);
       } else {
@@ -559,7 +560,7 @@ const SettingYourProfileConsumer = ({navigation}) => {
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Business name..."
+          placeholder="First Name..."
           placeholderTextColor={COLORS.black}
           value={businessName}
           onChangeText={setBusinessName}
