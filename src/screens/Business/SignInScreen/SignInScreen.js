@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -29,22 +29,45 @@ import {images} from '../../../assets/images';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../../../redux/slices/apiSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
 
 export default function SignInScreen({navigation}) {
   const text = '';
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
+  const [isConnected, setIsConnected] = useState(true);
+
 const dispatch=useDispatch()
 const { loading, error} = useSelector(state => state.api);
   const [flatTextSecureEntry, setFlatTextSecureEntry] = useState(true);
   const[loader,setLoader]=useState(false)
+  useEffect(() => {
+  const unsubscribe = NetInfo.addEventListener(state => {
+    setIsConnected(state.isConnected);
+  });
+
+  // Also fetch once on mount
+  NetInfo.fetch().then(state => {
+    setIsConnected(state.isConnected);
+  });
+
+  return () => unsubscribe();
+}, []);
+
   const handleUserName = text => {
     setUserName(text);
   };
   const handlePassword = text => {
     setPassword(text);
   };
-const handleLogin = async () => {
+
+  const handleLogin = async () => {
+  const netInfo = await NetInfo.fetch();
+  if (!netInfo.isConnected) {
+    Alert.alert('No Internet', 'Please check your internet connection.');
+    return;
+  }
+
   if (!userName) {
     alert('Please enter username or email');
     return;
@@ -63,7 +86,7 @@ const handleLogin = async () => {
               return
              }
     console.log('response:', response);
-     await AsyncStorage.setItem('userPic', `https://r6u.585.mytemp.website/public/${response?.user?.profile_image}`);
+     await AsyncStorage.setItem('userPic', `https://swaai.net/public/${response?.user?.profile_image}`);
     await AsyncStorage.setItem('user', JSON.stringify(response.user));
        await AsyncStorage.setItem('isSubscribed', String(response.is_Subscribed));
 
@@ -133,10 +156,36 @@ const handleLogin = async () => {
   }
 };
 
+if (!isConnected) {
+  return (
+    <View style={styles.noInternetContainer}>
+      <Image
+        source={require('../../../assets/images/noiternet.jpg')} // or use a URL
+        style={styles.noInternetImage}
+        resizeMode="contain"
+      />
+      <Text style={styles.noInternetTitle}>No Internet Connection</Text>
+      <Text style={styles.noInternetSubtitle}>
+        Please check your Wi-Fi or mobile data.
+      </Text>
+      <TouchableOpacity
+        style={styles.retryButton}
+        onPress={() => {
+         const netInfo =  NetInfo.fetch();
+if (!netInfo.isConnected) {
+  Alert.alert('No Internet', 'Please check your internet connection.');
+  return;
+}
+        }}>
+        <Text style={styles.retryButtonText}>Retry</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
 
   return (
     <KeyboardAvoidingView
-        style={{flex: 1}}
+        style={{flex: 1,backgroundColor:"white"}}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <TouchableWithoutFeedback
         // onPress={Keyboard.dismiss}
@@ -361,4 +410,43 @@ const styles = ScaledSheet.create({
     borderWidth: 1,
     borderColor: '#08A5F4',
   },
+  noInternetContainer: {
+  flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor: '#ffffff',
+  paddingHorizontal: '20@s',
+},
+noInternetImage: {
+  width: '80%',
+  height: '200@vs',
+  marginBottom: '20@vs',
+},
+noInternetTitle: {
+  fontSize: '22@s',
+  fontWeight: 'bold',
+  color: '#222',
+  marginBottom: '10@vs',
+  fontFamily: 'Poppins-SemiBold',
+  textAlign: 'center',
+},
+noInternetSubtitle: {
+  fontSize: '14@s',
+  color: '#666',
+  textAlign: 'center',
+  marginBottom: '20@vs',
+  fontFamily: 'Poppins-Regular',
+},
+retryButton: {
+  backgroundColor: COLORS.blue,
+  paddingVertical: '10@vs',
+  paddingHorizontal: '30@s',
+  borderRadius: '8@s',
+},
+retryButtonText: {
+  color: '#fff',
+  fontSize: '16@s',
+  fontFamily: 'Poppins-SemiBold',
+},
+
 });

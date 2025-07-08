@@ -130,7 +130,7 @@ const handleProfileChanges = async () => {
     // Dispatch API call
     const response = await dispatch(updateProfile(data)).unwrap();
     console.log('Response:', response);
-                  await AsyncStorage.setItem('userPic', `https://r6u.585.mytemp.website/public/${response?.user?.profile_image}`);
+                  await AsyncStorage.setItem('userPic', `https://swaai.net/public/${response?.user?.profile_image}`);
 
     Alert.alert('Success', response?.message);
   } catch (err) {
@@ -247,7 +247,7 @@ console.log(token,user);
 
     const config = {
       method: 'post',
-      url: 'https://r6u.585.mytemp.website/api/create-billing-portal',
+      url: 'https://swaai.net/api/create-billing-portal',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',

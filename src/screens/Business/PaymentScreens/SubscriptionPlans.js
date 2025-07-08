@@ -295,7 +295,7 @@ const [plans, setPlans] = useState([]);
 //     const email = user?.email || 'user@example.com';
 
 //     const returnUrl = 'myapp://payment-status?success=true';
-//     const baseUrl = 'https://r6u.585.mytemp.website/subscribe';
+//     const baseUrl = 'https://swaai.net/subscribe';
 
 //     const url = `${baseUrl}?token=${encodeURIComponent(token)}&user_id=${user?.id}&product=${encodeURIComponent(selectedPlan)}&price_id=${encodeURIComponent(selectedPriceId)}&email=${encodeURIComponent(email)}`;
 
@@ -324,7 +324,7 @@ onPress={async () => {
     }
 
     const returnUrl = 'myapp://payment-status?success=true'; // Your app’s scheme
-    const baseUrl = 'https://r6u.585.mytemp.website/subscribe';
+    const baseUrl = 'https://swaai.net/subscribe';
 
     const url = `${baseUrl}?token=${encodeURIComponent(token)}&user_id=${user?.id}&product=${selectedPlan}&price_id=${selectedPriceId}&email=${encodeURIComponent(email)}`;
 

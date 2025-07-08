@@ -171,7 +171,7 @@ console.log(token,user);
 
     const config = {
       method: 'post',
-      url: 'https://r6u.585.mytemp.website/api/create-billing-portal',
+      url: 'https://swaai.net/api/create-billing-portal',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -233,7 +233,7 @@ const handleDelete = async() => {
         onPress: async () => {
           try {
             const response = await axios.post(
-              `https://r6u.585.mytemp.website/api/deactivate-user/${id?.id}`,
+              `https://swaai.net/api/deactivate-user/${id?.id}`,
               {},
               {
                 headers: {

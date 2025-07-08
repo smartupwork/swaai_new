@@ -163,7 +163,7 @@ let data = JSON.stringify({
 let config = {
   method: 'patch',
   maxBodyLength: Infinity,
-  url: `https://r6u.585.mytemp.website/api/users/summary/${uid?.id}`,
+  url: `https://swaai.net/api/users/summary/${uid?.id}`,
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
@@ -589,7 +589,7 @@ if (!token) {
 
       // Send the request using fetch
       const response = await fetch(
-        'https://r6u.585.mytemp.website/api/insert-video',
+        'https://swaai.net/api/insert-video',
         requestOptions,
       );
 
@@ -623,7 +623,9 @@ if (!token) {
         <View style={styles.header}>
           <Image
             style={styles.logo}
-            source={{uri: profileDetail?.profile_image}} // Replace with your icon
+                        source={profileDetail?.profile_image?{uri: profileDetail?.profile_image}:images.avatar}
+            
+            // source={{uri: profileDetail?.profile_image}} // Replace with your icon
           />
           <Text style={styles.name}>
             {profileDetail?.first_name} {profileDetail?.last_name}
@@ -829,7 +831,7 @@ if (!token) {
         <TouchableOpacity
           onPress={() => navigation.navigate('CheckInBusiness')}
           style={styles.button}>
-          <Text style={styles.buttonText}>Check In Businesses</Text>
+          <Text style={styles.buttonText}>Checked In Businesses</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>

@@ -346,7 +346,6 @@ function BusinessDrawerNavigator() {
 }
 
 function AuthStack() {
- // console.log('AuthStack');
 
   return (
     <Stack.Navigator initialRouteName="SplashScreenOne">
@@ -595,8 +594,7 @@ function Main() {
 
   useEffect(() => {
     const handleDeepLink = ({ url }) => {
-      console.log("Deep link received:", url);
-
+   
       if (url?.startsWith('myapp://payment-status')) {
         const success = url.includes('success=true');
         if (success) {
@@ -631,7 +629,6 @@ function Main() {
         // Retrieve user and token from AsyncStorage
         const user = await AsyncStorage.getItem('user');
         const token = await AsyncStorage.getItem('token');
-console.log("main user",user);
 
         if (user && token) {
           const parsedUser = JSON.parse(user);
@@ -640,12 +637,13 @@ console.log("main user",user);
           if (parsedUser.role_id === 1) {
             setUserType('business');
        const isSubscribed = await AsyncStorage.getItem('isSubscribed');
-console.log(isSubscribed);
 
-            if(parsedUser.is_Subscribed == 1||isSubscribed==1)
+            if(parsedUser.is_Subscribed !== 1||isSubscribed!==1){
             setInitialRouteName('BusinessTabNavigator');
-          else
+            }
+          else{
           setInitialRouteName('SignInScreen')
+          }
           } else {
             setUserType('consumer');
             setInitialRouteName('ConsumerTabNavigator');

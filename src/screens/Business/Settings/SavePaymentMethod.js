@@ -170,7 +170,7 @@
 //     const response = await axios({
 //       method: 'post',
 //       maxBodyLength: Infinity,
-//       url: 'https://r6u.585.mytemp.website/api/card/edit',
+//       url: 'https://swaai.net/api/card/edit',
 //       headers: {
 //         Accept: 'application/json',
 //         'Content-Type': 'application/json',

@@ -327,7 +327,7 @@ useEffect(() => {
         <Text style={styles.categoriesTitle}>
           Explore the
           <Text style={[styles.highlight, {color: COLORS.cyan}]}>
-            Swaai
+           {' '} Swaai{' '}
           </Text>{' '}
           Community:
         </Text>

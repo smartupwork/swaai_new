@@ -108,10 +108,11 @@ const CheckInBusiness = ({navigation}) => {
     <ScrollView contentContainerStyle={styles.container}>
       {/* Header */}
       <HeaderComp
-        leftClick={() => alert('heelo')}
+        // leftClick={() => alert('heelo')}
         //rightClick={() => alert('heelo')}
-        rightClick={() => alert('heelo')}
+        // rightClick={() => alert('heelo')}
       />
+      
 
       {/* Sort and Filter */}
       <View style={styles.filterRow}>
@@ -148,7 +149,17 @@ const CheckInBusiness = ({navigation}) => {
           </Text>
         </TouchableOpacity>
       </View>
-
+{/* if(businessDetail.length==0){ */}
+  {
+    businessDetail.length==0&&
+  
+  <View style={styles.textContainer}>
+    <Text  style={[styles.category,{textAlign:'center',marginTop:20}]}>
+      No checkedIn business
+    </Text>
+  </View>
+  
+}
       {/* List */}
       {businessDetail.map(item => (
         <View key={item.id} style={styles.card}>

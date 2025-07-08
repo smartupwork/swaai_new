@@ -16,6 +16,7 @@ const TextInputComp = ({leftIcon,placeholder,placeholderTextColor,value,onChange
       value={value}
       onChangeText={onChangeText}
         style={styles.input}
+        autoCapitalize="none"
         inputMode='email'
         placeholder={placeholder}
         placeholderTextColor={placeholderTextColor}

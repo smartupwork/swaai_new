@@ -134,7 +134,7 @@ const createSubscription = async (
   
   try {
     const response = await fetch(
-      'https://r6u.585.mytemp.website/api/create-subscription',
+      'https://swaai.net/api/create-subscription',
       {
         method: 'POST',
         headers: {

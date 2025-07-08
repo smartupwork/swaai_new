@@ -15,6 +15,8 @@ useFocusEffect(
     const fetchUserPic = async () => {
       try {
         const pic = await AsyncStorage.getItem('userPic');
+      
+        
         if (pic) setUserPic(pic);
         else setUserPic(null);
       } catch (err) {
@@ -31,6 +33,8 @@ useFocusEffect(
         <FontAwesome name="" size={18} color="#323232" />
       </TouchableOpacity>
       <View style={{width:'33%',}}>
+{/* <Text>{userPic && userPic !== 'null' && !userPic.includes('/null') ? userPic : 'nj'}</Text> */}
+
       <Image source={images.headerLogo} style={styles.logoImg} />
      </View>
       <View style={{flexDirection: 'row', alignItems: 'center',justifyContent:'flex-end', gap: 5,width:'33%',paddingRight:8}}>
@@ -44,7 +48,7 @@ useFocusEffect(
         }
          <TouchableOpacity onPress={rightClick}>
           <Image
-            source={userPic ? { uri: userPic } : images.headerLogo2}
+            source={userPic  && !userPic.includes('/null') ? {uri:userPic} : images.headerLogo2}
             style={userPic ? styles.rightImg2 : styles.rightImg}
           />
         </TouchableOpacity>

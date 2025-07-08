@@ -421,17 +421,16 @@ const EditBusiness = ({navigation}) => {
       setMediaData(response?.data);
       setUserMedia(response?.data);
       console.log('response', response.data);
-      const videoUrl = response?.data.find(
-        media => media.video_url !== null,
-      )?.video_url;
+     const videos = response?.data.filter(media => media.video_url !== null);
+const lastVideoUrl = videos.length > 0 ? videos[videos.length - 1].video_url : null;
 
-      if (videoUrl) {
-        console.log('Video URL:', videoUrl);
-        // Set the video URL in your state or use it as needed
-        setVideoUri(videoUrl); // assuming setVideoUrl is a function that sets the video URL
-      } else {
-        console.log('No valid video URL found.');
-      }
+if (lastVideoUrl) {
+  console.log('Last Video URL:', lastVideoUrl);
+  setVideoUri(lastVideoUrl);
+} else {
+  console.log('No valid video URL found.');
+}
+
       // setUserDetail(response?.data?.user?.user);
     } catch (error) {
       console.log('Error fetching subscription plans:', error.message);
@@ -492,7 +491,7 @@ let data = JSON.stringify({
 let config = {
   method: 'patch',
   maxBodyLength: Infinity,
-  url: `https://r6u.585.mytemp.website/api/users/summary/${uid?.id}`,
+  url: `https://swaai.net/api/users/summary/${uid?.id}`,
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
@@ -978,7 +977,7 @@ const selectVideoSource = async () => {
     } else if (response.errorCode) {
       console.log('Error: ', response.errorMessage);
     } else if (response.assets && response.assets.length > 0) {
-      const video = response.assets[0];
+      const video = response.assets[response?.assets.length-1];
       setVideoUri(video.uri); // Save the video URI
       console.log('Video selected: ', video.uri);
       console.log('Video respose: ', response);
@@ -1003,59 +1002,60 @@ const selectVideoSource = async () => {
     }
   };
 
-  const uploadVideo = async uri => {
-    try {
-      setIsUploading(true); // Show loader
-      const token = await AsyncStorage.getItem('token');
-      const user = await AsyncStorage.getItem('user');
-      const id = JSON.parse(user);
-      if (!token) {
-        throw new Error('Token not found');
-      }
-      // Prepare headers
-      const myHeaders = new Headers();
-      myHeaders.append('Accept', 'application/json');
-      myHeaders.append('Content-Type', 'application/json');
-      myHeaders.append('Authorization', `Bearer ${token}`);
+const uploadVideo = async uri => {
+  try {
+    setIsUploading(true); // Show loader
+    const token = await AsyncStorage.getItem('token');
+    const user = await AsyncStorage.getItem('user');
+    const id = JSON.parse(user);
 
-      // Prepare form data
-      const formData = new FormData();
-      formData.append('user_id', id?.id);
-      formData.append('media_id', ''); // Adjust media_id as needed
-      formData.append('video', {
-        uri, // The URI of the video file
-        type: 'video/mp4', // Adjust MIME type if needed
-        name: 'uploaded-video.mp4', // Video filename
-      });
-
-      // Prepare request options
-      const requestOptions = {
-        method: 'POST',
-        headers: myHeaders,
-        body: formData,
-        redirect: 'follow',
-      };
-
-      // Send the request using fetch
-      const response = await fetch(
-        'https://r6u.585.mytemp.website/api/insert-video',
-        requestOptions,
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to upload video');
-      }
-
-      const result = await response.text();
-      console.log('Video uploaded successfully: ', result);
-      Alert.alert('Success', 'Video uploaded successfully!');
-    } catch (error) {
-      console.error('Video upload failed: ', error);
-      Alert.alert('Error', 'Failed to upload video.');
-    } finally {
-      setIsUploading(false); // Hide loader
+    if (!token) {
+      throw new Error('Token not found');
     }
-  };
+
+    // Prepare headers (DO NOT set Content-Type when using FormData)
+    const myHeaders = new Headers();
+    myHeaders.append('Accept', 'application/json');
+    myHeaders.append('Authorization', `Bearer ${token}`);
+
+    // Prepare form data
+    const formData = new FormData();
+    formData.append('user_id', id?.id);
+    formData.append('media_id', '');
+    formData.append('video', {
+      uri,
+      type: 'video/mp4',
+      name: 'uploaded-video.mp4',
+    });
+
+    // Prepare request options
+    const requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: formData,
+    };
+
+    // Send the request
+    const response = await fetch('https://swaai.net/api/insert-video', requestOptions);
+    console.log("response", response);
+
+    if (!response.ok) {
+      const errorText = await response.text(); // log server response if error
+      console.error("Upload failed response:", errorText);
+      throw new Error('Failed to upload video');
+    }
+
+    const result = await response.text();
+    console.log('Video uploaded successfully:', result);
+    Alert.alert('Success', 'Video uploaded successfully!');
+  } catch (error) {
+    console.error('Video upload failed:', error);
+    Alert.alert('Error', 'Failed to upload video.');
+  } finally {
+    setIsUploading(false); // Hide loader
+  }
+};
+
 
   if (isLoading) {
     return (
@@ -1111,6 +1111,11 @@ const selectVideoSource = async () => {
                     Supporting family owned, small businesses. Avid thrifter.
                   </Text> */}
                 </TouchableOpacity>
+{isUploading && (
+  <Text style={{ color: '#555', fontSize: 16, marginVertical: 10 }}>
+    Uploading video to server...
+  </Text>
+)}
          <Modal
                 animationType="slide"
                 transparent={true}

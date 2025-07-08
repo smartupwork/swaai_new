@@ -518,7 +518,7 @@ const SettingYourProfileConsumer = ({navigation}) => {
           updateConsumerProfile(updatedData),
         ).unwrap();
         console.log("update ",response);
-                  await AsyncStorage.setItem('userPic', `https://r6u.585.mytemp.website/public/${response?.user?.profile_image}`);
+                  await AsyncStorage.setItem('userPic', `https://swaai.net/public/${response?.user?.profile_image}`);
 
            await AsyncStorage.setItem('user', JSON.stringify(response.user));
         Alert.alert('Success', response?.message);

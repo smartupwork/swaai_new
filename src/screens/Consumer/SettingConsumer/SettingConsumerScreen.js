@@ -68,7 +68,7 @@ const SettingConsumerScreen = ({navigation}) => {
         onPress: async () => {
           try {
             const response = await axios.post(
-              `https://r6u.585.mytemp.website/api/deactivate-user/${id?.id}`,
+              `https://swaai.net/api/deactivate-user/${id?.id}`,
               {},
               {
                 headers: {

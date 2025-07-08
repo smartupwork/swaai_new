@@ -2,7 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import axios from 'axios';
 //const baseUrl = 'http://127.0.0.1:8000/';
-const baseUrl = 'https://r6u.585.mytemp.website/';
+// const baseUrl = 'https://r6u.585.mytemp.website/';
+const baseUrl="https://swaai.net/"
 // API Calls
 export const fetchPosts = createAsyncThunk(
   'api/fetchPosts',

@@ -171,57 +171,54 @@ setReviewLoader(true)
   };
 
   // Render video component
-  const renderBusinessVideo = () => {
-    try {
-      const videoItem = businessDetail?.media?.find(
-        item =>
-          item?.videos &&
-          typeof item.videos === 'string' &&
-          item.videos.trim() !== '',
-      );
+const renderBusinessVideo = () => {
+  try {
+    const videoList = businessDetail?.media?.filter(
+      item =>
+        item?.videos &&
+        typeof item.videos === 'string' &&
+        item.videos.trim() !== '',
+    );
 
-      if (!videoItem)
-        return <Text style={styles.errorText}>No video available</Text>;
-
-      const videoUrl = videoItem.videos.trim();
-      if (!videoUrl.startsWith('http')) {
-        console.error('Invalid video URL:', videoUrl);
-        return <Text style={styles.errorText}>Invalid video URL</Text>;
-      }
-
-      return (
-      <Video
-  ref={videoRef}
-  source={{ uri: videoUrl }}
-  rate={1.0}
-  volume={1.0}
-  isMuted={false}
-  resizeMode="cover"
-  shouldPlay={false} // Autoplay disabled
-  isLooping={false}
-  useNativeControls={true}  // ✅ ADD THIS LINE
-  controls
-  style={{
-    width: '90%',
-    alignSelf: 'center',
-    marginVertical: 10,
-    height: 200,
-  }}
-  onPlaybackStatusUpdate={status => {
-    if (status.isPlaying) handleAnalytics('video_play');
-  }}
-  onError={error => {
-    console.error('Video error:', error);
-    Alert.alert('Error', 'Failed to play video');
-  }}
-/>
-
-      );
-    } catch (error) {
-      console.error('Video render error:', error);
-      return <Text style={styles.errorText}>Error loading video</Text>;
+    if (!videoList || videoList.length === 0) {
+      return <Text style={styles.errorText}>No video available</Text>;
     }
-  };
+
+    const lastVideoItem = videoList[videoList.length - 1];
+    const videoUrl = lastVideoItem.videos.trim();
+
+    if (!videoUrl.startsWith('http')) {
+      console.error('Invalid video URL:', videoUrl);
+      return <Text style={styles.errorText}>Invalid video URL</Text>;
+    }
+
+    return (
+      <Video
+        ref={videoRef}
+        source={{ uri: videoUrl }}
+        style={{
+          width: '90%',
+          alignSelf: 'center',
+          marginVertical: 10,
+          height: 200,
+        }}
+        resizeMode="cover"
+        controls={true}
+        paused={false} // Autoplay
+        onLoad={() => handleAnalytics('video_play')}
+        onError={error => {
+          console.error('Video error:', error);
+          Alert.alert('Error', 'Failed to play video');
+        }}
+      />
+    );
+  } catch (error) {
+    console.error('Video render error:', error);
+    return <Text style={styles.errorText}>Error loading video</Text>;
+  }
+};
+
+
 
   if (loading) {
     return (
@@ -383,7 +380,7 @@ setReviewLoader(true)
 
           <View style={styles.companySummary}>
             <Text style={styles.companySummaryTitle}>
-              {businessDetail?.business?.description}
+              {businessDetail?.summary_desc}
             </Text>
             <Text style={styles.companySummarySubtitle}>
               {businessDetail?.business?.business_address}
